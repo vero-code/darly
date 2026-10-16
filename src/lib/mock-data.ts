@@ -17,7 +17,7 @@ export interface RingEntrywayDevice {
 
 export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
   {
-    id: 'darly-ring-doorbell',
+    id: 'darly-video-doorbell',
     name: 'Ring Video Doorbell',
     kind: 'doorbell',
     online: true,
