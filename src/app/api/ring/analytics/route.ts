@@ -14,13 +14,25 @@ export async function GET(request: NextRequest) {
 
   // If live mode requested, inspect recent webhook events
   if (scenarioParam === 'live') {
-    const liveTimeline = eventStore.slice(0, 20).map((e: any) => ({
-      deviceId: e.device_id || 'ring-device',
-      deviceName: e.device_id?.includes('doorbell') ? 'Ring Video Doorbell' : 'Ring Alarm Sensor',
-      eventType: e.event_type === 'ding' ? 'ding' : (e.event_type || 'motion_detected'),
-      relativeTime: e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : 'Just now',
-      description: `Live sensor event: ${e.event_type || 'activity detected'}`,
-    }))
+    const liveTimeline = eventStore.slice(0, 20).map((e: any) => {
+      let eventType: 'motion_detected' | 'door_opened' | 'door_closed' | 'ding' = 'motion_detected'
+      const rawType = String(e.event_type || '').toLowerCase()
+      if (rawType.includes('open')) {
+        eventType = 'door_opened'
+      } else if (rawType.includes('close')) {
+        eventType = 'door_closed'
+      } else if (rawType.includes('ding') || rawType.includes('chime')) {
+        eventType = 'ding'
+      }
+
+      return {
+        deviceId: e.device_id || 'ring-device',
+        deviceName: e.device_name || (e.device_id?.includes('doorbell') ? 'Ring Video Doorbell' : 'Ring Alarm Sensor'),
+        eventType,
+        relativeTime: e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : 'Just now',
+        description: `Live sensor event: ${e.event_type || 'activity detected'}`,
+      }
+    })
 
     const analysis = analyzeEntrywayActivity(liveTimeline)
 

@@ -44,7 +44,14 @@ export function checkDoorAjar(events: ScenarioEvent[]): DetectedAnomaly | null {
  * Rule 3: Distinguishes external delivery/porch motion from indoor activity.
  */
 export function checkVisitorFilter(events: ScenarioEvent[]): DetectedAnomaly | null {
-  const hasPorchActivity = events.some((e) => e.eventType === 'ding' || (e.deviceId === 'darly-video-doorbell' && e.eventType === 'motion_detected'))
+  const hasPorchActivity = events.some(
+    (e) =>
+      e.eventType === 'ding' ||
+      ((e.deviceId === 'darly-video-doorbell' ||
+        e.deviceName?.toLowerCase().includes('doorbell') ||
+        e.deviceId?.toLowerCase().includes('doorbell')) &&
+        e.eventType === 'motion_detected')
+  )
   const hasDoorOpen = events.some((e) => e.eventType === 'door_opened')
 
   if (hasPorchActivity && !hasDoorOpen) {
