@@ -17,8 +17,8 @@ export interface RingEntrywayDevice {
 
 export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
   {
-    id: 'darly-front-doorbell',
-    name: 'Front Door Video Doorbell',
+    id: 'darly-ring-doorbell',
+    name: 'Ring Video Doorbell',
     kind: 'doorbell',
     online: true,
     batteryLevel: 94,
@@ -27,8 +27,8 @@ export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
     simulated: true,
   },
   {
-    id: 'darly-contact-sensor-01',
-    name: 'Front Door Contact Sensor',
+    id: 'darly-contact-sensor',
+    name: 'Ring Alarm Contact Sensor',
     kind: 'contact_sensor',
     online: true,
     batteryLevel: 100,
@@ -38,13 +38,13 @@ export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
     simulated: true,
   },
   {
-    id: 'darly-motion-sensor-01',
-    name: 'Entryway Motion Detector',
+    id: 'darly-motion-detector',
+    name: 'Ring Alarm Motion Detector',
     kind: 'motion_sensor',
     online: true,
     batteryLevel: 89,
     capabilities: { motionDetection: true },
-    location: 'Exterior Walkway',
+    location: 'Front Porch',
     simulated: true,
   },
 ]
