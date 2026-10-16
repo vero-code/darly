@@ -14,13 +14,22 @@ export async function GET(request: NextRequest) {
 
   // If live mode requested, inspect recent webhook events
   if (scenarioParam === 'live') {
-    const analysis = analyzeEntrywayActivity([])
+    const liveTimeline = eventStore.slice(0, 20).map((e: any) => ({
+      deviceId: e.device_id || 'ring-device',
+      deviceName: e.device_id?.includes('doorbell') ? 'Ring Video Doorbell' : 'Ring Alarm Sensor',
+      eventType: e.event_type === 'ding' ? 'ding' : (e.event_type || 'motion_detected'),
+      relativeTime: e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : 'Just now',
+      description: `Live sensor event: ${e.event_type || 'activity detected'}`,
+    }))
+
+    const analysis = analyzeEntrywayActivity(liveTimeline)
+
     return NextResponse.json({
       success: true,
       mode: 'live',
       activeScenario: null,
       analysis,
-      events: eventStore.slice(0, 20),
+      timeline: liveTimeline,
       availableScenarios: CARE_SCENARIOS.map((s) => ({
         id: s.id,
         title: s.title,
