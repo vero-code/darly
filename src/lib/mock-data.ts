@@ -17,8 +17,8 @@ export interface RingEntrywayDevice {
 
 export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
   {
-    id: process.env.NEXT_PUBLIC_RING_DEVICE_ID || 'darly-front-doorbell',
-    name: process.env.NEXT_PUBLIC_RING_DEVICE_NAME || 'Front Door & Entryway',
+    id: 'darly-front-doorbell',
+    name: 'Front Door Video Doorbell',
     kind: 'doorbell',
     online: true,
     batteryLevel: 94,

@@ -1,11 +1,24 @@
 import { NextResponse } from 'next/server'
-import { getAccessToken } from '@/lib/auth'
+import { getAccessToken, getAuthMode } from '@/lib/auth'
+import { SIMULATED_DEVICES } from '@/lib/mock-data'
 
 const DEVICE_ID = process.env.NEXT_PUBLIC_RING_DEVICE_ID
 const DEVICE_NAME = process.env.NEXT_PUBLIC_RING_DEVICE_NAME || 'Camera'
 const API_BASE = 'https://api.amazonvision.com'
 
 export async function GET() {
+  const authMode = getAuthMode()
+
+  // 1. Simulation Mode (Without Token)
+  if (!authMode) {
+    return NextResponse.json({
+      mode: 'simulation',
+      message: 'Running in Simulation Mode. Set RING_ACCESS_TOKEN in .env.local to enable Live Mode.',
+      devices: SIMULATED_DEVICES,
+    })
+  }
+
+  // 2. Live Mode (Token is configured)
   try {
     const token = await getAccessToken()
 
