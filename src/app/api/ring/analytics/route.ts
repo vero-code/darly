@@ -25,9 +25,23 @@ export async function GET(request: NextRequest) {
         eventType = 'ding'
       }
 
+      let deviceName = e.device_name
+      if (!deviceName) {
+        const idOrType = (String(e.device_id || '') + ' ' + String(e.event_type || '')).toLowerCase()
+        if (idOrType.includes('doorbell') || idOrType.includes('ding')) {
+          deviceName = 'Ring Video Doorbell'
+        } else if (idOrType.includes('contact') || idOrType.includes('door') || idOrType.includes('open') || idOrType.includes('close')) {
+          deviceName = 'Ring Alarm Contact Sensor'
+        } else if (idOrType.includes('motion')) {
+          deviceName = 'Ring Alarm Motion Detector'
+        } else {
+          deviceName = 'Ring Alarm Sensor'
+        }
+      }
+
       return {
         deviceId: e.device_id || 'ring-device',
-        deviceName: e.device_name || (e.device_id?.includes('doorbell') ? 'Ring Video Doorbell' : 'Ring Alarm Sensor'),
+        deviceName,
         eventType,
         relativeTime: e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : 'Just now',
         description: `Live sensor event: ${e.event_type || 'activity detected'}`,
