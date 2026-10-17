@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { RingEntrywayDevice } from '@/lib/types/devices';
 
 import { 
@@ -10,7 +10,8 @@ import {
   RotateCcw,
   Bell,
   Activity,
-  Radio
+  Radio,
+  Search,
 } from 'lucide-react';
 
 interface SensorGridProps {
@@ -24,6 +25,9 @@ export const SensorGrid: React.FC<SensorGridProps> = ({
   onToggleSensor,
   onResetAllSensors,
 }) => {
+  const [filterLocation, setFilterLocation] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
   const getSensorIcon = (sensor: RingEntrywayDevice) => {
     switch (sensor.kind) {
       case 'video_doorbell':
@@ -45,6 +49,13 @@ export const SensorGrid: React.FC<SensorGridProps> = ({
     }
   };
 
+  const filteredSensors = sensors.filter((s) => {
+    const matchesLocation = filterLocation === 'all' || s.location === filterLocation;
+    const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          s.location.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesLocation && matchesSearch;
+  });
+
   return (
     <div className="space-y-6">
       {/* Editorial Header */}
@@ -64,9 +75,44 @@ export const SensorGrid: React.FC<SensorGridProps> = ({
         </button>
       </div>
 
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* Filter */}
+        <div className="flex items-center gap-1.5 p-1.5 bg-white border border-sky-100 rounded-2xl shadow-xs overflow-x-auto">
+          {[
+            { id: 'all', label: `All Devices (${sensors.length})` },
+            { id: 'Front Porch', label: 'Front Porch (2)' },
+            { id: 'Front Door', label: 'Front Door (1)' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setFilterLocation(tab.id)}
+              className={`px-4 py-2 text-[14px] font-semibold rounded-xl whitespace-nowrap transition-colors cursor-pointer ${
+                filterLocation === tab.id
+                  ? 'bg-sky-500 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Search */}
+        <div className="relative">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search devices or location..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 pr-4 py-2.5 text-[14px] bg-white border border-sky-200 rounded-2xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 w-full sm:w-72 shadow-xs"
+          />
+        </div>
+      </div>
+
       {/* Sensor Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        {sensors.map((sensor) => {
+        {filteredSensors.map((sensor) => {
           const isOpen = sensor.state === 'open';
 
           return (
