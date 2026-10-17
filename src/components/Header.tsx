@@ -66,7 +66,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenSettings}
               className="p-2.5 text-slate-600 hover:text-sky-600 hover:bg-sky-50 rounded-xl transition-colors border border-sky-100 bg-white shadow-xs cursor-pointer"
-              title="Settings & Contacts"
+              title="Settings"
             >
               <SlidersHorizontal className="w-5 h-5" />
             </button>

@@ -11,6 +11,7 @@ import { Header } from "@/components/Header";
 import { SettingsModal } from "@/components/SettingsModal";
 import { PrivacyInspector } from "@/components/PrivacyInspector";
 import { FloatingCloudsBackground } from "@/components/CloudElements";
+import { Footer } from "@/components/Footer";
 
 export default function Home() {
   const [sensors, setSensors] = useState<RingEntrywayDevice[]>(SIMULATED_DEVICES);
@@ -68,6 +69,9 @@ export default function Home() {
         profile={profile}
         onSave={handleSaveProfile}
       />
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
