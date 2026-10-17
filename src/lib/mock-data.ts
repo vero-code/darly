@@ -1,4 +1,5 @@
-import { RingEntrywayDevice } from './types/devices';
+import type { RingEntrywayDevice } from './types/devices';
+import type { ResidentProfile } from './types/profile';
 
 export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
   {
@@ -33,3 +34,26 @@ export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
     simulated: true,
   },
 ]
+
+export const DEFAULT_RESIDENT_PROFILE: ResidentProfile = {
+  name: 'Margaret Holloway',
+  age: 78,
+  timezone: 'America/Los_Angeles (PST)',
+  address: '382 Orchard Crest Lane, Bellevue, WA 98004',
+  notes: 'Enjoys morning tea on porch. Takes morning blood pressure medication at 8:30 AM.',
+  primaryCaregiver: {
+    name: 'Sarah Holloway',
+    relationship: 'Daughter',
+    phone: '+1 (555) 014-2831',
+    status: 'online',
+  },
+  neighborHelper: {
+    name: 'Thomas Campbell',
+    phone: '+1 (555) 019-3310',
+    address: 'Apt 4B (Next door)',
+  },
+  emergencyService: {
+    provider: 'Bellevue Emergency Medical Services (EMS)',
+    phone: '911',
+  },
+};

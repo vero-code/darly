@@ -240,7 +240,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
           href="https://ring.com/support" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-sky-600 underline underline-offset-2 hover:text-sky-800 transition-colors cursor-pointer font-medium"
+          className="text-sky-600 underline underline-offset-4 decoration-sky-300 hover:decoration-sky-600 hover:text-sky-800 transition-colors cursor-pointer font-medium"
         >
           Ring product
         </a>{' '}
