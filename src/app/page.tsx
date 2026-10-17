@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { RingEntrywayDevice, SIMULATED_DEVICES } from '@/lib/mock-data';
+import { RingEntrywayDevice } from '@/lib/types/devices';
+import { SIMULATED_DEVICES } from '@/lib/mock-data';
 import { Header } from "@/components/Header";
 import { PrivacyInspector } from "@/components/PrivacyInspector";
 import { FloatingCloudsBackground } from "@/components/CloudElements";
