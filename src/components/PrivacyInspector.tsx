@@ -8,25 +8,55 @@ import {
   Check, 
   Cpu,
 } from 'lucide-react';
-import { RingEntrywayDevice } from '@/lib/mock-data';
+import type { RingEntrywayDevice } from '@/lib/types/devices';
 
 interface PrivacyInspectorProps {
   sensors: RingEntrywayDevice[];
 }
 
-export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors }) => {
+export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = [] }) => {
   const [copied, setCopied] = useState(false);
 
-  const contactSensor = sensors.find((s) => s.kind === 'contact_sensor') || sensors[0];
+  // Default to contact sensor, or fallback to first device
+  const defaultId = sensors.find((s) => s.kind === 'contact_sensor')?.id || sensors[0]?.id || '';
+  const [selectedId, setSelectedId] = useState<string>(defaultId);
+
+  // Current selected device
+  const selectedDevice = sensors.find((s) => s.id === selectedId) || sensors[0];
+
+  const getDataType = (kind?: string) => {
+    switch (kind) {
+      case 'doorbell':
+        return 'doorbell_chime_event';
+      case 'motion_sensor':
+        return 'passive_infrared_motion';
+      default:
+        return 'discrete_contact_switch';
+    }
+  };
+
+  const getDeviceState = (device?: RingEntrywayDevice) => {
+    if (!device) return 'CLOSED';
+    if (device.kind === 'contact_sensor') {
+      return (device.state ?? 'closed').toUpperCase();
+    }
+    if (device.kind === 'motion_sensor') {
+      return 'IDLE';
+    }
+    if (device.kind === 'doorbell') {
+      return 'STANDBY';
+    }
+    return device.online ? 'ONLINE' : 'OFFLINE';
+  };
 
   const samplePayload = {
-    sensor_id: contactSensor?.id ?? 'darly-contact-sensor',
-    device_name: contactSensor?.name ?? 'Ring Alarm Contact Sensor',
-    location: contactSensor?.location ?? 'Front Door',
-    state: (contactSensor?.state ?? 'closed').toUpperCase(),
+    sensor_id: selectedDevice?.id ?? 'darly-contact-sensor',
+    device_name: selectedDevice?.name ?? 'Ring Alarm Contact Sensor',
+    location: selectedDevice?.location ?? 'Front Door',
+    state: getDeviceState(selectedDevice),
     timestamp: new Date().toISOString(),
-    battery_percentage: contactSensor?.batteryLevel ? `${contactSensor.batteryLevel}%` : '100%',
-    data_type: 'discrete_contact_switch',
+    battery_percentage: selectedDevice?.batteryLevel ? `${selectedDevice.batteryLevel}%` : '100%',
+    data_type: getDataType(selectedDevice?.kind),
   };
 
   const jsonString = JSON.stringify(samplePayload, null, 2);
@@ -88,7 +118,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors }) =
 
       {/* Live Raw JSON Payload Inspector */}
       <div className="p-6 bg-white/95 border border-sky-100 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <FileCode className="w-5 h-5 text-sky-600" />
             <h3 className="text-[18px] font-bold text-slate-900">
@@ -98,7 +128,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors }) =
 
           <button
             onClick={handleCopy}
-            className="px-4 py-2 text-[14px] font-semibold rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 transition-colors flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 text-[14px] font-semibold rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-auto"
           >
             {copied ? (
               <>
@@ -114,12 +144,36 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors }) =
           </button>
         </div>
 
-        <p className="text-[16px] text-slate-600">
-          When triggered, only the device identifier, binary state (OPEN / CLOSED), and timestamp are transmitted.
+        {/* Interactive Device Selector Tabs */}
+        <div className="flex flex-wrap gap-2 pt-1 pb-1">
+          {sensors.map((device) => {
+            const isSelected = device.id === selectedDevice?.id;
+            return (
+              <button
+                key={device.id}
+                onClick={() => setSelectedId(device.id)}
+                type="button"
+                className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+                  isSelected
+                    ? 'bg-sky-600 text-white shadow-sm ring-2 ring-sky-600/20'
+                    : 'bg-white text-slate-600 hover:bg-sky-50 border border-sky-200/80 hover:text-sky-900'
+                }`}
+              >
+                <span>{device.name}</span>
+                <span className={`text-[11px] px-1.5 py-0.5 rounded-md ${isSelected ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                  {device.location}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="text-[15px] text-slate-600">
+          When triggered, only discrete telemetry events (device ID, state, timestamp) are transmitted — never audio or video streams into care logs.
         </p>
 
         {/* Code Block with large 14px font */}
-        <div className="p-5 bg-slate-900 rounded-2xl font-mono text-[14px] overflow-x-auto text-sky-300 leading-relaxed">
+        <div className="p-5 bg-slate-900 rounded-2xl font-mono text-[14px] overflow-x-auto text-sky-300 leading-relaxed shadow-inner">
           <pre>{jsonString}</pre>
         </div>
       </div>
