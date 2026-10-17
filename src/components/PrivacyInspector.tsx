@@ -9,6 +9,7 @@ import {
   Cpu,
 } from 'lucide-react';
 import type { RingEntrywayDevice } from '@/lib/types/devices';
+import type { ScenarioEvent } from '@/lib/scenarios';
 
 interface PrivacyInspectorProps {
   sensors: RingEntrywayDevice[];
@@ -24,33 +25,85 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
   // Current selected device
   const selectedDevice = sensors.find((s) => s.id === selectedId) || sensors[0];
 
-  const getEventType = (device?: RingEntrywayDevice) => {
-    if (!device) return 'door_closed';
-    if (device.kind === 'contact_sensor') {
-      return device.state === 'open' ? 'door_opened' : 'door_closed';
+  const getEventDetails = (device?: RingEntrywayDevice) => {
+    switch (device?.kind) {
+      case 'motion_sensor':
+        return {
+          eventType: 'motion_detected' as const,
+          description: 'Movement detected near the front entrance.',
+        };
+      case 'doorbell':
+        return {
+          eventType: 'ding' as const,
+          description: 'Doorbell chime pressed at front porch.',
+        };
+      case 'contact_sensor':
+      default:
+        return {
+          eventType: (device?.state === 'open' ? 'door_opened' : 'door_closed') as 'door_opened' | 'door_closed',
+          description: device?.state === 'open'
+            ? 'Front door opened.'
+            : 'Front door closed and securely latched.',
+        };
     }
-    if (device.kind === 'motion_sensor') {
-      return 'motion_detected';
-    }
-    if (device.kind === 'doorbell') {
-      return 'ding';
-    }
-    return 'status_ping';
   };
 
-  const samplePayload = {
-    device_id: selectedDevice?.id ?? 'darly-contact-sensor',
-    device_name: selectedDevice?.name ?? 'Ring Alarm Contact Sensor',
-    location: selectedDevice?.location ?? 'Front Door',
-    event_type: getEventType(selectedDevice),
-    timestamp: new Date().toISOString(),
-    battery_level: selectedDevice?.batteryLevel ?? 100,
+  const { eventType, description } = getEventDetails(selectedDevice);
+
+  const relativeTime = new Date().toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  });
+
+  const samplePayload: ScenarioEvent = {
+    deviceId: selectedDevice?.id ?? 'darly-contact-sensor',
+    deviceName: selectedDevice?.name ?? 'Ring Alarm Contact Sensor',
+    eventType,
+    relativeTime,
+    description,
   };
 
   const jsonString = JSON.stringify(samplePayload, null, 2);
 
+  const getRawRingPayload = (device?: RingEntrywayDevice) => {
+    const devId = device?.id ?? 'darly-contact-sensor';
+    const now = Date.now();
+
+    let rawType = 'motion_detected';
+    if (device?.kind === 'doorbell') {
+      rawType = 'ding';
+    } else if (device?.kind === 'contact_sensor') {
+      rawType = device.state === 'open' ? 'door_opened' : 'door_closed';
+    }
+
+    return {
+      meta: {
+        request_id: `req_ring_${now.toString(16).slice(-8)}`,
+      },
+      data: {
+        id: `evt_ring_${(now + 1).toString(16).slice(-8)}`,
+        type: rawType,
+        attributes: {
+          source: devId,
+          timestamp: now,
+        },
+      },
+    };
+  };
+
+  const rawPayload = getRawRingPayload(selectedDevice);
+  const rawJsonString = JSON.stringify(rawPayload, null, 2);
+
+  const combinedPayload = {
+    raw_ring_webhook: rawPayload,
+    darly_normalized_event: samplePayload,
+  };
+  const combinedJsonString = JSON.stringify(combinedPayload, null, 2);
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(jsonString);
+    navigator.clipboard.writeText(combinedJsonString);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -160,9 +213,23 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
           When a door opens, the system only receives these few lines of text — never video, audio, or personal details.
         </p>
 
-        {/* Code Block with large 14px font */}
-        <div className="p-5 bg-slate-900 rounded-2xl font-mono text-[14px] overflow-x-auto text-sky-300 leading-relaxed shadow-inner">
-          <pre>{jsonString}</pre>
+        {/* Two Code Windows: Raw Webhook vs Normalized Event */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Window 1: Raw Ring Webhook */}
+          <div className="p-5 bg-slate-900 rounded-2xl font-mono text-[14px] overflow-x-auto text-sky-300 leading-relaxed shadow-inner">
+            <div className="text-slate-400 text-[14px] mb-3 select-none">
+              // 1. Raw Ring Data
+            </div>
+            <pre>{rawJsonString}</pre>
+          </div>
+
+          {/* Window 2: Normalized Darly Event */}
+          <div className="p-5 bg-slate-900 rounded-2xl font-mono text-[14px] overflow-x-auto text-sky-300 leading-relaxed shadow-inner">
+            <div className="text-slate-400 text-[14px] mb-3 select-none">
+              // 2. Darly Normalized Data
+            </div>
+            <pre>{jsonString}</pre>
+          </div>
         </div>
       </div>
 
