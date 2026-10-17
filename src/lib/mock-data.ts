@@ -5,7 +5,7 @@ export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
   {
     id: 'darly-video-doorbell',
     name: 'Ring Video Doorbell',
-    kind: 'doorbell',
+    kind: 'video_doorbell',
     online: true,
     batteryLevel: 94,
     capabilities: { motionDetection: true, video: true, chime: true },
