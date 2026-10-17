@@ -122,7 +122,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
           <div className="flex items-center gap-2">
             <FileCode className="w-5 h-5 text-sky-600" />
             <h3 className="text-[18px] font-bold text-slate-900">
-              Sample Sensor Event Payload
+              What The System Sees
             </h3>
           </div>
 
@@ -145,7 +145,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
         </div>
 
         {/* Interactive Device Selector Tabs */}
-        <div className="flex flex-wrap gap-2 pt-1 pb-1">
+        <div className="flex flex-wrap gap-2.5 pt-1 pb-1">
           {sensors.map((device) => {
             const isSelected = device.id === selectedDevice?.id;
             return (
@@ -153,14 +153,14 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
                 key={device.id}
                 onClick={() => setSelectedId(device.id)}
                 type="button"
-                className={`px-3.5 py-1.5 rounded-xl text-[13px] font-semibold transition-all cursor-pointer flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl text-[14px] font-semibold transition-all cursor-pointer flex items-center gap-2.5 ${
                   isSelected
-                    ? 'bg-sky-600 text-white shadow-sm ring-2 ring-sky-600/20'
-                    : 'bg-white text-slate-600 hover:bg-sky-50 border border-sky-200/80 hover:text-sky-900'
+                    ? 'bg-sky-600 text-white shadow-sm ring-2 ring-sky-600/20 border border-sky-600'
+                    : 'bg-white text-slate-700 hover:bg-sky-50 border border-sky-200 hover:text-sky-900'
                 }`}
               >
                 <span>{device.name}</span>
-                <span className={`text-[11px] px-1.5 py-0.5 rounded-md ${isSelected ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <span className={`text-[14px] font-normal px-2 py-0.5 rounded-lg ${isSelected ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
                   {device.location}
                 </span>
               </button>
@@ -168,8 +168,8 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
           })}
         </div>
 
-        <p className="text-[15px] text-slate-600">
-          When triggered, only discrete telemetry events (device ID, state, timestamp) are transmitted — never audio or video streams into care logs.
+        <p className="text-[16px] text-slate-600">
+          When a door opens, the system only receives these few lines of text — never video, audio, or personal details.
         </p>
 
         {/* Code Block with large 14px font */}
@@ -179,8 +179,8 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
       </div>
 
       {/* Prototype Disclaimer */}
-      <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-100 text-[13px] text-slate-500 leading-relaxed text-center">
-        <span className="font-semibold text-slate-700">Disclaimer:</span> Device names and features are referenced for prototype demonstration purposes. Hardware capabilities may vary by specific Ring product generation; please refer to official Ring documentation.
+      <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-100 text-[14px] text-slate-600 leading-relaxed text-center">
+        <span className="font-semibold text-slate-800">Disclaimer:</span> Device names and features are referenced for prototype demonstration purposes. Hardware capabilities may vary by specific Ring product generation; please refer to official Ring documentation.
       </div>
     </div>
   );
