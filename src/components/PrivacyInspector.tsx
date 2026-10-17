@@ -24,39 +24,27 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
   // Current selected device
   const selectedDevice = sensors.find((s) => s.id === selectedId) || sensors[0];
 
-  const getDataType = (kind?: string) => {
-    switch (kind) {
-      case 'doorbell':
-        return 'doorbell_chime_event';
-      case 'motion_sensor':
-        return 'passive_infrared_motion';
-      default:
-        return 'discrete_contact_switch';
-    }
-  };
-
-  const getDeviceState = (device?: RingEntrywayDevice) => {
-    if (!device) return 'CLOSED';
+  const getEventType = (device?: RingEntrywayDevice) => {
+    if (!device) return 'door_closed';
     if (device.kind === 'contact_sensor') {
-      return (device.state ?? 'closed').toUpperCase();
+      return device.state === 'open' ? 'door_opened' : 'door_closed';
     }
     if (device.kind === 'motion_sensor') {
-      return 'IDLE';
+      return 'motion_detected';
     }
     if (device.kind === 'doorbell') {
-      return 'STANDBY';
+      return 'ding';
     }
-    return device.online ? 'ONLINE' : 'OFFLINE';
+    return 'status_ping';
   };
 
   const samplePayload = {
-    sensor_id: selectedDevice?.id ?? 'darly-contact-sensor',
+    device_id: selectedDevice?.id ?? 'darly-contact-sensor',
     device_name: selectedDevice?.name ?? 'Ring Alarm Contact Sensor',
     location: selectedDevice?.location ?? 'Front Door',
-    state: getDeviceState(selectedDevice),
+    event_type: getEventType(selectedDevice),
     timestamp: new Date().toISOString(),
-    battery_percentage: selectedDevice?.batteryLevel ? `${selectedDevice.batteryLevel}%` : '100%',
-    data_type: getDataType(selectedDevice?.kind),
+    battery_level: selectedDevice?.batteryLevel ?? 100,
   };
 
   const jsonString = JSON.stringify(samplePayload, null, 2);
@@ -160,7 +148,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
                 }`}
               >
                 <span>{device.name}</span>
-                <span className={`text-[14px] font-normal px-2 py-0.5 rounded-lg ${isSelected ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                <span className={`text-[14px] font-normal px-2.5 py-0.5 rounded-lg ${isSelected ? 'bg-sky-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
                   {device.location}
                 </span>
               </button>
@@ -168,7 +156,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
           })}
         </div>
 
-        <p className="text-[16px] text-slate-600">
+        <p className="text-[16px] text-slate-600 leading-relaxed">
           When a door opens, the system only receives these few lines of text — never video, audio, or personal details.
         </p>
 
@@ -180,7 +168,16 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
 
       {/* Prototype Disclaimer */}
       <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-100 text-[14px] text-slate-600 leading-relaxed text-center">
-        <span className="font-semibold text-slate-800">Disclaimer:</span> Device names and features are referenced for prototype demonstration purposes. Hardware capabilities may vary by specific Ring product generation; please refer to official Ring documentation.
+        <span className="font-semibold text-slate-800">Disclaimer:</span> Device names and features are referenced for prototype demonstration purposes. Hardware capabilities may vary by specific{' '}
+        <a 
+          href="https://ring.com/support" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-sky-600 underline underline-offset-2 hover:text-sky-800 transition-colors cursor-pointer font-medium"
+        >
+          Ring product
+        </a>{' '}
+        generation.
       </div>
     </div>
   );

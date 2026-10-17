@@ -35,15 +35,15 @@ export const Header: React.FC<HeaderProps> = ({
           <nav className="hidden md:flex items-center gap-6 text-[16px] font-medium text-slate-600">
             <button
               onClick={() => setActiveTab('floorplan')}
-              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 ${
+              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 cursor-pointer ${
                 activeTab === 'floorplan' ? 'text-sky-600 border-sky-500 font-semibold' : 'border-transparent'
               }`}
             >
-              Floor plan
+              Floor Plan
             </button>
             <button
               onClick={() => setActiveTab('sensors')}
-              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 ${
+              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 cursor-pointer ${
                 activeTab === 'sensors' ? 'text-sky-600 border-sky-500 font-semibold' : 'border-transparent'
               }`}
             >
@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('privacy')}
-              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 ${
+              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 cursor-pointer ${
                 activeTab === 'privacy' ? 'text-sky-600 border-sky-500 font-semibold' : 'border-transparent'
               }`}
             >
