@@ -9,9 +9,11 @@ import {
 } from '@/lib/mock-data';
 import { Header } from "@/components/Header";
 import { SettingsModal } from "@/components/SettingsModal";
+import { SensorGrid } from '@/components/SensorGrid';
 import { PrivacyInspector } from "@/components/PrivacyInspector";
 import { FloatingCloudsBackground } from "@/components/CloudElements";
 import { Footer } from "@/components/Footer";
+import { ambientAudio } from '@/utils/audioChime';
 
 export default function Home() {
   const [sensors, setSensors] = useState<RingEntrywayDevice[]>(SIMULATED_DEVICES);
@@ -40,6 +42,44 @@ export default function Home() {
     }
   };
 
+  // Toggle sensor state manually or via Floor Plan
+  const handleToggleSensor = (sensorId: string) => {
+    setSensors((prev) =>
+      prev.map((s) => {
+        if (s.id !== sensorId) return s;
+
+        // Toggle state
+        let newState: RingEntrywayDevice['state'] = s.state === 'open' ? 'closed' : 'open';
+
+        // Play corresponding sound
+        if(newState === 'open') {
+          if (s.kind === 'video_doorbell') {
+            ambientAudio.playGentleCheckinChime();
+          } else if (s.kind === 'motion_sensor') {
+            ambientAudio.playMotionPing();
+          } else {
+            ambientAudio.playDoorOpenChime();
+          }
+        }
+
+        return {
+          ...s,
+          state: newState,
+        };
+      })
+    );
+  };
+
+  // Reset all sensors
+  const handleResetAllSensors = () => {
+    setSensors((prev) =>
+      prev.map((s) => ({
+        ...s,
+        state: 'closed',
+      }))
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-200/60 via-sky-100/50 to-blue-50/60 text-slate-800 flex flex-col relative overflow-x-hidden">
       {/* Clouds Background */}
@@ -56,6 +96,14 @@ export default function Home() {
       </div>
 
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {activeTab === 'sensors' && (
+          <SensorGrid
+            sensors={sensors}
+            onToggleSensor={handleToggleSensor}
+            onResetAllSensors={handleResetAllSensors}
+          />
+        )}
+
         {/* Privacy */}
         {activeTab === 'privacy' && (
           <PrivacyInspector sensors={sensors} />
