@@ -577,7 +577,7 @@ export const House3DView: React.FC<House3DViewProps> = ({
 
         {/* Live Device Interactive Quick Controls Overlay */}
         <QuickControlsOverlay
-          isDoorbellRinging={isDoorbellRinging}
+          isDoorbellRinging={isDoorbellRinging || doorbellSensor?.state === 'open'}
           onTriggerDoorbell={handleTriggerDoorbell}
           isDoorOpen={frontDoorSensor?.state === 'open'}
           onToggleDoor={() => onToggleSensor('darly-contact-sensor')}
