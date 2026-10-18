@@ -59,7 +59,7 @@ export const CARE_SCENARIOS: CareScenario[] = [
   },
   {
     id: 'night_wandering',
-    title: 'Night Wandering Alert',
+    title: 'Night Wandering',
     category: 'night_alert',
     severity: 'critical',
     description: 'Front door opened unexpectedly at 03:15 AM and remained ajar without closure, indicating potential confusion or fall.',
@@ -90,7 +90,7 @@ export const CARE_SCENARIOS: CareScenario[] = [
   },
   {
     id: 'missed_routine',
-    title: 'Missed Routine Check-in',
+    title: 'Missed Routine',
     category: 'inactivity',
     severity: 'warning',
     description: 'No morning entryway activity or door movement detected past typical 10:00 AM waking window.',
@@ -107,7 +107,7 @@ export const CARE_SCENARIOS: CareScenario[] = [
   },
   {
     id: 'delivery_filter',
-    title: 'Postal Delivery (Noise Filtered)',
+    title: 'Postal Delivery',
     category: 'visitor',
     severity: 'info',
     description: 'External courier approached the porch, rang the doorbell, and departed. Interior door remained closed.',

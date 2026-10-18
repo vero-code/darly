@@ -3,6 +3,8 @@ import { RingEntrywayDevice } from '@/lib/types/devices';
 import { ResidentProfile } from '@/lib/types/profile';
 import { ResidentInfoBar } from './ResidentInfoBar';
 import { House3DView } from './House3DView';
+import { CareScenariosPanel } from './CareScenariosPanel';
+import type { CareScenario } from '@/lib/scenarios';
 import {
   Box,
   Volume2,
@@ -24,6 +26,32 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
   lastChimeSentTime,
 }) => {
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>('darly-contact-sensor');
+  const [activeScenarioId, setActiveScenarioId] = useState<string>('normal_morning');
+
+  const handleSelectScenario = (scenario: CareScenario) => {
+    setActiveScenarioId(scenario.id);
+    // Synchronize 3D model with scenario state
+    if (scenario.id === 'night_wandering') {
+      // Open door in 3D to show danger
+      const door = sensors.find((s) => s.id === 'darly-contact-sensor');
+      if (door && door.state !== 'open') {
+        onToggleSensor('darly-contact-sensor');
+      }
+    } else if (scenario.id === 'normal_morning') {
+      // Close door in 3D
+      const door = sensors.find((s) => s.id === 'darly-contact-sensor');
+      if (door && door.state === 'open') {
+        onToggleSensor('darly-contact-sensor');
+      }
+    } else if (scenario.id === 'delivery_filter') {
+      // Close door and trigger doorbell
+      const door = sensors.find((s) => s.id === 'darly-contact-sensor');
+      if (door && door.state === 'open') {
+        onToggleSensor('darly-contact-sensor');
+      }
+      onToggleSensor('darly-video-doorbell');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -88,6 +116,12 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
               </div>
             )}
           </div>
+
+          {/* Care Scenarios Simulation Panel */}
+          <CareScenariosPanel
+            activeScenarioId={activeScenarioId}
+            onSelectScenario={handleSelectScenario}
+          />
         </div>
       </div>
     </div>

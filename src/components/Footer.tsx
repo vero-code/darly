@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="relative z-10 mt-auto border-t border-sky-100 bg-white/70 backdrop-blur-md py-5 px-4 text-[14px] text-slate-600">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-medium">
+      <div className="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-medium">
         {/* Left */}
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
           <span>© {currentYear}</span>
