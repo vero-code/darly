@@ -124,7 +124,7 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
                 className="absolute left-0 top-0 bottom-0 bg-indigo-100/60 border-r border-indigo-200 flex items-start justify-center pt-2 pointer-events-none"
                 style={{ width: `${(baseline.sleepWindowEndHour / 24) * 100}%` }}
               >
-                <span className="text-[13px] font-bold uppercase tracking-wider text-indigo-700/80">Night Rest</span>
+                <span className="text-[13px] font-bold uppercase tracking-wider text-indigo-700/80 hidden sm:inline">Night Rest</span>
               </div>
 
               {/* Morning Routine Window: sleepWindowEndHour - morningRoutineDeadlineHour */}
