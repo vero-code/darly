@@ -116,47 +116,47 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
 
         {/* The 24-Hour Timeline Track */}
         <div className="space-y-3 pt-6">
-          <div className="relative h-16">
+          <div className="relative h-20">
             {/* Background Track with rounded clip */}
             <div className="absolute inset-0 bg-gradient-to-r from-sky-50/70 via-blue-50/50 to-sky-50/70 rounded-2xl border border-sky-200 overflow-hidden shadow-inner">
               {/* Curfew block: 00:00 - sleepWindowEndHour */}
               <div 
-                className="absolute left-0 top-0 bottom-0 bg-indigo-100/60 border-r border-indigo-200 flex items-center justify-center pointer-events-none"
+                className="absolute left-0 top-0 bottom-0 bg-indigo-100/60 border-r border-indigo-200 flex items-start justify-center pt-2 pointer-events-none"
                 style={{ width: `${(baseline.sleepWindowEndHour / 24) * 100}%` }}
               >
-                <span className="text-[14px] font-semibold text-indigo-700">Night Rest</span>
+                <span className="text-[13px] font-bold uppercase tracking-wider text-indigo-700/80">Night Rest</span>
               </div>
 
               {/* Morning Routine Window: sleepWindowEndHour - morningRoutineDeadlineHour */}
               <div 
-                className="absolute top-0 bottom-0 bg-sky-200/50 border-r border-sky-300 flex items-center justify-center pointer-events-none"
+                className="absolute top-0 bottom-0 bg-sky-200/50 border-r border-sky-300 flex items-start justify-center pt-2 pointer-events-none"
                 style={{ 
                   left: `${(baseline.sleepWindowEndHour / 24) * 100}%`, 
                   width: `${((baseline.morningRoutineDeadlineHour - baseline.sleepWindowEndHour) / 24) * 100}%` 
                 }}
               >
-                <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Morning Routine</span>
+                <span className="text-[13px] font-bold uppercase tracking-wider text-sky-800/80 hidden sm:inline">Morning Routine</span>
               </div>
 
               {/* Evening Calm: 19:30 - sleepWindowStartHour */}
               <div 
-                className="absolute top-0 bottom-0 bg-sky-200/50 border-l border-sky-300 flex items-center justify-center pointer-events-none"
+                className="absolute top-0 bottom-0 bg-sky-200/50 border-l border-sky-300 flex items-start justify-center pt-2 pointer-events-none"
                 style={{ 
                   left: `${(19.5 / 24) * 100}%`, 
                   right: `${((24 - baseline.sleepWindowStartHour) / 24) * 100}%` 
                 }}
               >
-                <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Evening Calm</span>
+                <span className="text-[13px] font-bold uppercase tracking-wider text-sky-800/80 hidden sm:inline">Evening Calm</span>
               </div>
 
               {/* Night Sleep: sleepWindowStartHour - 24:00 */}
               <div 
-                className="absolute right-0 top-0 bottom-0 bg-indigo-100/60 border-l border-indigo-200 flex items-center justify-center pointer-events-none"
+                className="absolute right-0 top-0 bottom-0 bg-indigo-100/60 border-l border-indigo-200 flex items-start justify-center pt-2 pointer-events-none"
                 style={{ 
                   width: `${((24 - baseline.sleepWindowStartHour) / 24) * 100}%` 
                 }}
               >
-                <span className="text-[14px] font-semibold text-indigo-700 hidden sm:inline">Night Sleep</span>
+                <span className="text-[13px] font-bold uppercase tracking-wider text-indigo-700/80 hidden sm:inline">Night Sleep</span>
               </div>
             </div>
 
@@ -164,7 +164,7 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
             {clusters.map((cluster) => (
               <div 
                 key={cluster.id}
-                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 group cursor-pointer transition-transform hover:scale-110"
+                className="absolute top-[58%] -translate-y-1/2 -translate-x-1/2 z-20 group cursor-pointer transition-transform hover:scale-110"
                 style={{ left: `${cluster.timePercent}%` }}
               >
                 <div className={`relative w-8 h-8 rounded-full ${cluster.primaryGlyph.bg} border-2 border-white flex items-center justify-center shadow-md`}>
