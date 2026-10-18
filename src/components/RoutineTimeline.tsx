@@ -61,6 +61,9 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
       .replace(/\b\w/g, (c) => c.toUpperCase());
 
     // Color by semantic category
+    if (act.includes('alert') || act.includes('ajar')) {
+      return { label, className: 'bg-rose-100 text-rose-800 border border-rose-300 font-bold' };
+    }
     if (act.includes('open')) {
       return { label, className: 'bg-amber-100 text-amber-900 border border-amber-200' };
     }

@@ -164,7 +164,7 @@ export const CareScenariosPanel: React.FC<CareScenariosPanelProps> = ({
           {activeScenario.events && activeScenario.events.length > 0 && (
             <div className="pt-2.5 border-t border-black/10 space-y-2">
               <div className="text-[14px] font-bold text-slate-600 uppercase tracking-wide">
-                Detected Signal Sequence:
+                Detected Signals:
               </div>
               <div className="space-y-2">
                 {activeScenario.events.map((evt, idx) => (

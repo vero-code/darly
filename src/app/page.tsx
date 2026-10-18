@@ -29,6 +29,7 @@ export default function Home() {
   // Stopwatch tracking for active open door sensors
   const sensorOpenTimestamps = useRef<Record<string, number>>({});
   const sensorOpenEventIds = useRef<Record<string, string>>({});
+  const doorAjarWatchdogRef = useRef<NodeJS.Timeout | null>(null);
 
   const [activeTab, setActiveTab] = useState<string>('floorplan');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -40,6 +41,10 @@ export default function Home() {
       const saved = localStorage.getItem('darly_resident_profile');
       if (saved) {
         setProfile(JSON.parse(saved));
+      }
+      const savedBaseline = localStorage.getItem('darly_routine_baseline');
+      if (savedBaseline) {
+        setBaseline(JSON.parse(savedBaseline));
       }
     } catch {
       // Ignore storage errors
@@ -70,6 +75,15 @@ export default function Home() {
     setProfile(updatedProfile);
     try {
       localStorage.setItem('darly_resident_profile', JSON.stringify(updatedProfile));
+    } catch {
+      // Ignore storage errors
+    }
+  };
+
+  const handleSaveBaseline = (updatedBaseline: RoutineBaselineConfig) => {
+    setBaseline(updatedBaseline);
+    try {
+      localStorage.setItem('darly_routine_baseline', JSON.stringify(updatedBaseline));
     } catch {
       // Ignore storage errors
     }
@@ -150,6 +164,25 @@ export default function Home() {
         sensorOpenTimestamps.current[target.id] = now;
         sensorOpenEventIds.current[target.id] = openEventId;
 
+        // Arm watchdog timer for Door Ajar threshold
+        if (doorAjarWatchdogRef.current) clearTimeout(doorAjarWatchdogRef.current);
+        const alertDelayMs = (baseline.doorAjarThresholdMinutes || 5) * 60 * 1000;
+        doorAjarWatchdogRef.current = setTimeout(() => {
+          ambientAudio.playEmergencyTone();
+          const alertTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          setEvents((cur) => [
+            {
+              id: `evt-ajar-${Date.now()}`,
+              deviceId: target.id,
+              sensorName: target.name,
+              action: 'door_ajar_alert',
+              timestamp: alertTime,
+              durationSeconds: (baseline.doorAjarThresholdMinutes || 5) * 60,
+            },
+            ...cur,
+          ]);
+        }, alertDelayMs);
+
         setEvents((prev) => [
           {
             id: openEventId,
@@ -163,7 +196,12 @@ export default function Home() {
           ...prev,
         ]);
       } else {
-        // Door closed - measure elapsed duration with stopwatch
+        // Door closed - disarm watchdog timer and measure elapsed duration
+        if (doorAjarWatchdogRef.current) {
+          clearTimeout(doorAjarWatchdogRef.current);
+          doorAjarWatchdogRef.current = null;
+        }
+
         const startTime = sensorOpenTimestamps.current[target.id];
         const openEventId = sensorOpenEventIds.current[target.id];
         const elapsedSeconds = startTime ? Math.max(1, Math.round((now - startTime) / 1000)) : 1;
@@ -197,6 +235,11 @@ export default function Home() {
 
   // Reset all sensors
   const handleResetAllSensors = () => {
+    if (doorAjarWatchdogRef.current) {
+      clearTimeout(doorAjarWatchdogRef.current);
+      doorAjarWatchdogRef.current = null;
+    }
+
     const now = Date.now();
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -295,6 +338,8 @@ export default function Home() {
         onClose={() => setIsSettingsOpen(false)}
         profile={profile}
         onSave={handleSaveProfile}
+        baseline={baseline}
+        onSaveBaseline={handleSaveBaseline}
       />
 
       <ChimeModal

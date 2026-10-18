@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ResidentProfile } from '@/lib/types/profile';
+import type { RoutineBaselineConfig } from '@/lib/engine/routine-baseline';
 import { 
   X, 
   Save, 
@@ -12,6 +13,8 @@ interface SettingsModalProps {
   onClose: () => void;
   profile: ResidentProfile;
   onSave: (updatedProfile: ResidentProfile) => void;
+  baseline: RoutineBaselineConfig;
+  onSaveBaseline: (updatedBaseline: RoutineBaselineConfig) => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -19,16 +22,38 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   profile,
   onSave,
+  baseline,
+  onSaveBaseline,
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'profile' | 'contacts'>('profile');
+  const [activeSubTab, setActiveSubTab] = useState<'routine' | 'profile' | 'contacts'>('routine');
 
   const [formProfile, setFormProfile] = useState<ResidentProfile>(profile);
+  const [formBaseline, setFormBaseline] = useState<RoutineBaselineConfig>(baseline);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    setFormProfile(profile);
+  }, [profile]);
+
+  useEffect(() => {
+    setFormBaseline(baseline);
+  }, [baseline]);
 
   if (!isOpen) return null;
 
+  const formatHourToTime = (hour: number) => {
+    return `${hour.toString().padStart(2, '0')}:00`;
+  };
+
+  const parseTimeToHour = (timeStr: string) => {
+    const [h] = timeStr.split(':');
+    const parsed = parseInt(h, 10);
+    return isNaN(parsed) ? 0 : Math.max(0, Math.min(23, parsed));
+  };
+
   const handleSave = () => {
     onSave(formProfile);
+    onSaveBaseline(formBaseline);
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
@@ -60,6 +85,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         {/* Tab navigation */}
         <div className="flex border-b border-slate-100 px-6 pt-3 gap-6 text-[16px] font-medium shrink-0">
           <button
+            onClick={() => setActiveSubTab('routine')}
+            type="button"
+            className={`pb-3 border-b-2 transition-colors cursor-pointer ${
+              activeSubTab === 'routine' ? 'text-sky-600 border-sky-500 font-bold' : 'text-slate-500 border-transparent hover:text-slate-800'
+            }`}
+          >
+            Routine Schedule
+          </button>
+          <button
             onClick={() => setActiveSubTab('profile')}
             type="button"
             className={`pb-3 border-b-2 transition-colors cursor-pointer ${
@@ -81,6 +115,134 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Tab Content */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1 text-[16px]">
+          {activeSubTab === 'routine' && (
+            <div className="space-y-6">
+              {/* Entryway Safety Threshold: Door Ajar Limit */}
+              <div className="p-5 bg-sky-50/70 border border-sky-200 rounded-2xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="font-bold text-slate-900 text-[16px] block">
+                      Door Ajar Limit
+                    </label>
+                    <span className="text-slate-600 text-[14px]">
+                      Alerts caregiver if the entryway door remains open longer than this duration
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-mono text-[22px] font-bold text-sky-700">
+                      {formBaseline.doorAjarThresholdMinutes}
+                    </span>
+                    <span className="text-slate-600 text-[14px] ml-1">min</span>
+                  </div>
+                </div>
+
+                <input
+                  type="range"
+                  min="1"
+                  max="15"
+                  step="1"
+                  value={formBaseline.doorAjarThresholdMinutes}
+                  onChange={(e) =>
+                    setFormBaseline({
+                      ...formBaseline,
+                      doorAjarThresholdMinutes: parseInt(e.target.value, 10),
+                    })
+                  }
+                  className="w-full accent-sky-500 cursor-pointer"
+                />
+
+                <div className="flex justify-between text-[14px] font-semibold text-slate-500">
+                  <span>1 min</span>
+                  <span>5 min (Default)</span>
+                  <span>15 min</span>
+                </div>
+              </div>
+
+              {/* Daily Circadian Rhythm Schedule (Hours for 24h Timeline) */}
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-bold text-slate-900 text-[16px]">
+                    Timeline Schedule
+                  </h4>
+                  <p className="text-slate-500 text-[14px]">
+                    Configures phase hours on the 24-hour visual timeline.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Night Rest */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between h-full space-y-3">
+                    <div>
+                      <label className="font-bold text-slate-900 block text-[16px]">
+                        Night Rest
+                      </label>
+                      <p className="text-slate-500 text-[14px] mt-0.5">
+                        Ends: morning begins
+                      </p>
+                    </div>
+                    <input
+                      type="time"
+                      value={formatHourToTime(formBaseline.sleepWindowEndHour)}
+                      onChange={(e) =>
+                        setFormBaseline({
+                          ...formBaseline,
+                          sleepWindowEndHour: parseTimeToHour(e.target.value),
+                        })
+                      }
+                      className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-mono text-[16px]"
+                    />
+                  </div>
+
+                  {/* Morning Routine */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between h-full space-y-3">
+                    <div>
+                      <label className="font-bold text-slate-900 block text-[16px]">
+                        Morning Routine
+                      </label>
+                      <p className="text-slate-500 text-[14px] mt-0.5">
+                        Ends: routine deadline
+                      </p>
+                    </div>
+                    <input
+                      type="time"
+                      value={formatHourToTime(formBaseline.morningRoutineDeadlineHour)}
+                      onChange={(e) =>
+                        setFormBaseline({
+                          ...formBaseline,
+                          morningRoutineDeadlineHour: parseTimeToHour(e.target.value),
+                        })
+                      }
+                      className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-mono text-[16px]"
+                    />
+                  </div>
+
+                  {/* Night Sleep */}
+                  <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between h-full space-y-3">
+                    <div>
+                      <label className="font-bold text-slate-900 block text-[16px]">
+                        Night Sleep
+                      </label>
+                      <p className="text-slate-500 text-[14px] mt-0.5">
+                        Starts: night curfew
+                      </p>
+                    </div>
+                    <input
+                      type="time"
+                      value={formatHourToTime(formBaseline.sleepWindowStartHour)}
+                      onChange={(e) =>
+                        setFormBaseline({
+                          ...formBaseline,
+                          sleepWindowStartHour: parseTimeToHour(e.target.value),
+                        })
+                      }
+                      className="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-mono text-[16px]"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeSubTab === 'profile' && (
             <div className="space-y-4">
               <div className="space-y-1.5">

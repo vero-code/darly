@@ -20,7 +20,7 @@ export interface SensorEventLog {
   id: string;
   deviceId: string;
   sensorName: string;
-  action: 'opened' | 'closed' | 'motion_detected' | 'ring';
+  action: 'opened' | 'closed' | 'motion_detected' | 'ring' | 'door_ajar_alert';
   timestamp: string;
   durationSeconds?: number;
   openedAt?: number;
