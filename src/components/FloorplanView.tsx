@@ -25,7 +25,7 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
   onSendChime,
   lastChimeSentTime,
 }) => {
-  const [selectedSensorId, setSelectedSensorId] = useState<string | null>('darly-contact-sensor');
+  const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null);
   const [activeScenarioId, setActiveScenarioId] = useState<string>('normal_morning');
 
   const handleSelectScenario = (scenario: CareScenario) => {
@@ -92,36 +92,35 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
 
         {/* Telemetry Panel */}
         <div className="lg:col-span-4 bg-white/95 border border-sky-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-6">
+          {/* Care Scenarios Simulation Panel */}
+          <CareScenariosPanel
+            activeScenarioId={activeScenarioId}
+            onSelectScenario={handleSelectScenario}
+          />
           {/* Ambient In-Home Chime Action Box */}
           <div className="p-4 bg-gradient-to-br from-sky-50 to-blue-50/70 border border-sky-200 rounded-2xl space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[16px] font-bold text-slate-800 flex items-center gap-2">
                 <Volume2 className="w-5 h-5 text-sky-600" />
-                <span>Gentle In-Home Chime</span>
+                <span>In-Home Chime</span>
               </span>
             </div>
             <p className="text-[14px] text-slate-600 leading-relaxed">
-              {`Plays a soft, pleasant chime in ${profile.name.split(' ')[0]}'s entryway for a gentle wellness check.`}
+              {`Plays a soothing melody in ${profile.name.split(' ')[0]}'s hallway for a calm wellness check.`}
             </p>
             <button
               onClick={onSendChime}
               className="w-full py-2.5 px-3 bg-white hover:bg-sky-50 text-sky-700 border border-sky-300 rounded-xl text-[14px] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
             >
               <Volume2 className="w-4 h-4" />
-              <span>Send Gentle Chime</span>
+              <span>Play Chime</span>
             </button>
             {lastChimeSentTime && (
               <div className="text-[14px] text-slate-500 text-center">
-                Last chime sent at {lastChimeSentTime}
+                Last played at {lastChimeSentTime}
               </div>
             )}
           </div>
-
-          {/* Care Scenarios Simulation Panel */}
-          <CareScenariosPanel
-            activeScenarioId={activeScenarioId}
-            onSelectScenario={handleSelectScenario}
-          />
         </div>
       </div>
     </div>

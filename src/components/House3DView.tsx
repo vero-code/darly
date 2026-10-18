@@ -12,7 +12,7 @@ interface House3DViewProps {
   sensors: RingEntrywayDevice[];
   onToggleSensor: (sensorId: string) => void;
   selectedSensorId: string | null;
-  onSelectSensor: (sensorId: string) => void;
+  onSelectSensor: (sensorId: string | null) => void;
 }
 
 export const House3DView: React.FC<House3DViewProps> = ({
@@ -555,6 +555,7 @@ export const House3DView: React.FC<House3DViewProps> = ({
     if (dev === 'all') {
       targetCameraPos.current.set(7.5, 5.5, 7.5);
       targetLookAt.current.set(0, 1.4, 0);
+      onSelectSensor(null);
     } else if (dev === 'doorbell') {
       targetCameraPos.current.set(-1.25, 1.55, 1.8);
       targetLookAt.current.set(-1.25, 1.45, 0.15);

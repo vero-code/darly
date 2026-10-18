@@ -10,6 +10,7 @@ export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
     batteryLevel: 94,
     capabilities: { motionDetection: true, video: true, chime: true },
     location: 'Front Porch',
+    careRole: 'Visitor & Delivery Alerts',
     simulated: true,
   },
   {
@@ -21,6 +22,7 @@ export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
     state: 'closed',
     capabilities: { contactSensor: true },
     location: 'Front Door',
+    careRole: 'Night Wandering Safety',
     simulated: true,
   },
   {
@@ -30,7 +32,8 @@ export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
     online: true,
     batteryLevel: 89,
     capabilities: { motionDetection: true },
-    location: 'Front Porch',
+    location: 'Indoor Foyer',
+    careRole: 'Daily Routine Tracking',
     simulated: true,
   },
 ]

@@ -12,5 +12,6 @@ export interface RingEntrywayDevice {
     chime?: boolean
   }
   location: string
+  careRole?: string
   simulated: boolean
 }

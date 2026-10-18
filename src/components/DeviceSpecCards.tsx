@@ -20,16 +20,20 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
   isMotionActive,
   onFocusDevice,
 }) => {
-  const isRinging = isDoorbellRinging || sensors.some((s) => s.id === 'darly-video-doorbell' && s.state === 'open');
-  const isDoorOpen = sensors.some((s) => s.id === 'darly-contact-sensor' && s.state === 'open');
-  const isMotion = isMotionActive || sensors.some((s) => s.id === 'darly-motion-detector' && s.state === 'open');
+  const doorbellSensor = sensors.find((s) => s.id === 'darly-video-doorbell');
+  const contactSensor = sensors.find((s) => s.id === 'darly-contact-sensor');
+  const motionSensor = sensors.find((s) => s.id === 'darly-motion-detector');
+
+  const isRinging = isDoorbellRinging || doorbellSensor?.state === 'open';
+  const isDoorOpen = contactSensor?.state === 'open';
+  const isMotion = isMotionActive || motionSensor?.state === 'open';
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-[14px]">
-        {/* Device 1: Ring Video Doorbel */}
+        {/* Device 1: Video Doorbell */}
         <div 
           onClick={() => onFocusDevice('doorbell')}
-          className={`p-5 rounded-3xl border transition-all cursor-pointer ${
+          className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col h-full ${
             selectedSensorId === 'darly-video-doorbell' || activeDeviceFocus === 'doorbell'
               ? 'bg-sky-50/80 border-sky-400 ring-2 ring-sky-200 shadow-md'
               : 'bg-white/95 border-sky-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-sky-200'
@@ -45,19 +49,27 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
             </span>
           </div>
 
-          <h4 className="text-[18px] font-bold text-slate-900 mt-3 flex items-center gap-1.5">
-            <Bell className="w-5 h-5 text-sky-500" />
-            <span>Ring Video Doorbell</span>
+          <h4 className="text-[18px] font-bold text-slate-900 mt-3 flex items-center gap-2">
+            <Bell className="w-5 h-5 text-sky-500 shrink-0" />
+            <span>Video Doorbell</span>
           </h4>
-          <p className="text-[16px] text-slate-600 mt-1">
+          <p className="text-[16px] text-slate-600 mt-1 mb-4 flex-1">
             Outdoor video doorbell on porch. Monitors guest arrivals, deliveries, and front entryway safety.
           </p>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[14px]">
-            <span className="text-slate-500">Chime Button:</span>
-            <span className="font-bold text-slate-900">
-              {isRinging ? 'Ringing Now' : 'Standby / Ready'}
-            </span>
+          <div className="mt-auto pt-3 border-t border-slate-100 space-y-1.5 text-[14px]">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500">Location:</span>
+              <span className="font-semibold text-slate-800">
+                {doorbellSensor?.location || 'Front Porch'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500">Care Role:</span>
+              <span className="font-semibold text-sky-700">
+                {doorbellSensor?.careRole || 'Visitor & Delivery Alerts'}
+              </span>
+            </div>
           </div>
 
           <a 
@@ -72,10 +84,10 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
           </a>
         </div>
 
-        {/* Device 2: Ring Alarm Contact Sensor */}
+        {/* Device 2: Contact Sensor */}
         <div 
           onClick={() => onFocusDevice('contact')}
-          className={`p-5 rounded-3xl border transition-all cursor-pointer ${
+          className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col h-full ${
             selectedSensorId === 'darly-contact-sensor' || activeDeviceFocus === 'contact'
               ? 'bg-sky-50/80 border-sky-400 ring-2 ring-sky-200 shadow-md'
               : 'bg-white/95 border-sky-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-sky-200'
@@ -92,19 +104,27 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
             </span>
           </div>
 
-          <h4 className="text-[18px] font-bold text-slate-900 mt-3 flex items-center gap-1.5">
-            <DoorClosed className="w-5 h-5 text-sky-500" />
-            <span>Ring Alarm Contact Sensor</span>
+          <h4 className="text-[18px] font-bold text-slate-900 mt-3 flex items-center gap-2">
+            <DoorClosed className="w-5 h-5 text-sky-500 shrink-0" />
+            <span>Contact Sensor</span>
           </h4>
-          <p className="text-[16px] text-slate-600 mt-1">
+          <p className="text-[16px] text-slate-600 mt-1 mb-4 flex-1">
             Door open & close sensor. Tracks resident routines, returning home, and entryway safety.
           </p>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[14px]">
-            <span className="text-slate-500">Magnetic Reed:</span>
-            <span className="font-bold text-slate-900">
-              {isDoorOpen ? 'Contact Open' : 'Contact Closed'}
-            </span>
+          <div className="mt-auto pt-3 border-t border-slate-100 space-y-1.5 text-[14px]">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500">Location:</span>
+              <span className="font-semibold text-slate-800">
+                {contactSensor?.location || 'Front Door'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500">Care Role:</span>
+              <span className="font-semibold text-sky-700">
+                {contactSensor?.careRole || 'Night Wandering Safety'}
+              </span>
+            </div>
           </div>
 
           <a 
@@ -119,10 +139,10 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
           </a>
         </div>
 
-        {/* Device 3: Ring Alarm Motion Detector */}
+        {/* Device 3: Motion Detector */}
         <div 
           onClick={() => onFocusDevice('motion')}
-          className={`p-5 rounded-3xl border transition-all cursor-pointer ${
+          className={`p-5 rounded-3xl border transition-all cursor-pointer flex flex-col h-full ${
             selectedSensorId === 'darly-motion-detector' || activeDeviceFocus === 'motion'
               ? 'bg-sky-50/80 border-sky-400 ring-2 ring-sky-200 shadow-md'
               : 'bg-white/95 border-sky-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-sky-200'
@@ -135,23 +155,31 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
             <span className={`px-2.5 py-0.5 rounded-full text-[14px] font-semibold ${
               isMotion ? 'bg-amber-100 text-amber-900 animate-pulse' : 'bg-sky-100 text-sky-800'
             }`}>
-              {isMotion ? 'Motion Active' : 'Clear / Idle'}
+              {isMotion ? 'Motion Detected' : 'Clear'}
             </span>
           </div>
 
-          <h4 className="text-[18px] font-bold text-slate-900 mt-3 flex items-center gap-1.5">
-            <Footprints className="w-5 h-5 text-sky-500" />
-            <span>Ring Alarm Motion Detector</span>
+          <h4 className="text-[18px] font-bold text-slate-900 mt-3 flex items-center gap-2">
+            <Footprints className="w-5 h-5 text-sky-500 shrink-0" />
+            <span>Motion Detector</span>
           </h4>
-          <p className="text-[16px] text-slate-600 mt-1">
+          <p className="text-[16px] text-slate-600 mt-1 mb-4 flex-1">
             Entryway PIR motion sensor. Detects movement in foyer without privacy-intrusive cameras.
           </p>
 
-          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[14px]">
-            <span className="text-slate-500">PIR Fresnel Lens:</span>
-            <span className="font-bold text-slate-900">
-              {isMotion ? 'Motion Detected' : 'Area Clear'}
-            </span>
+          <div className="mt-auto pt-3 border-t border-slate-100 space-y-1.5 text-[14px]">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500">Location:</span>
+              <span className="font-semibold text-slate-800">
+                {motionSensor?.location || 'Indoor Foyer'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500">Care Role:</span>
+              <span className="font-semibold text-sky-700">
+                {motionSensor?.careRole || 'Daily Routine Tracking'}
+              </span>
+            </div>
           </div>
 
           <a 
