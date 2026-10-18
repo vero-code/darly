@@ -95,8 +95,10 @@ export const SensorGrid: React.FC<SensorGridProps> = ({
         <div className="flex items-center gap-1.5 p-1.5 bg-white border border-sky-100 rounded-2xl shadow-xs overflow-x-auto">
           {[
             { id: 'all', label: `All Devices (${sensors.length})` },
-            { id: 'Front Porch', label: 'Front Porch (2)' },
-            { id: 'Front Door', label: 'Front Door (1)' },
+            ...Array.from(new Set(sensors.map((s) => s.location))).map((loc) => ({
+              id: loc,
+              label: `${loc} (${sensors.filter((s) => s.location === loc).length})`,
+            })),
           ].map((tab) => (
             <button
               key={tab.id}
