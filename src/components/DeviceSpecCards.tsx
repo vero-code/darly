@@ -39,8 +39,9 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
             <div className="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold">
               1
             </div>
-            <span className="px-2.5 py-0.5 rounded-full text-[14px] font-semibold bg-sky-100 text-sky-800">
-              Front Porch
+            <span className={`px-2.5 py-0.5 rounded-full text-[14px] font-semibold ${isRinging ? 'bg-amber-100 text-amber-900 animate-pulse' : 'bg-sky-100 text-sky-800'
+            }`}>
+              {isRinging ? 'Ringing...' : 'Standby'}
             </span>
           </div>
 
@@ -85,7 +86,7 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
               2
             </div>
             <span className={`px-2.5 py-0.5 rounded-full text-[14px] font-semibold ${
-              isDoorOpen ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
+              isDoorOpen ? 'bg-amber-100 text-amber-900' : 'bg-sky-100 text-sky-800'
             }`}>
               {isDoorOpen ? 'Open' : 'Closed'}
             </span>
@@ -132,7 +133,7 @@ export const DeviceSpecCards: React.FC<DeviceSpecCardsProps> = ({
               3
             </div>
             <span className={`px-2.5 py-0.5 rounded-full text-[14px] font-semibold ${
-              isMotion ? 'bg-sky-200 text-sky-900 animate-pulse' : 'bg-slate-100 text-slate-700'
+              isMotion ? 'bg-amber-100 text-amber-900 animate-pulse' : 'bg-sky-100 text-sky-800'
             }`}>
               {isMotion ? 'Motion Active' : 'Clear / Idle'}
             </span>

@@ -24,34 +24,34 @@ export const QuickControlsOverlay: React.FC<QuickControlsOverlayProps> = ({
       <button
         onClick={onTriggerDoorbell}
         className={`px-3.5 py-2 rounded-xl text-[14px] font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer ${
-            isDoorbellRinging
-            ? 'bg-sky-500 text-white ring-4 ring-sky-200 animate-pulse'
+          isDoorbellRinging
+            ? 'bg-amber-400 text-slate-950 ring-4 ring-amber-200 animate-pulse'
             : 'bg-white/95 text-slate-800 hover:bg-sky-50 border border-sky-200'
         }`}
       >
-        <Bell className="w-4 h-4 text-sky-500" />
-        <span>{isDoorbellRinging ? 'Chime Active...' : 'Ring Doorbell'}</span>
+        <Bell className={`w-4 h-4 ${isDoorbellRinging ? 'text-amber-900' : 'text-sky-500'}`} />
+        <span>{isDoorbellRinging ? 'Doorbell Ringing...' : 'Ring Doorbell'}</span>
       </button>
 
       {/* Quick Door Toggle Button */}
       <button
         onClick={onToggleDoor}
         className={`px-3.5 py-2 rounded-xl text-[14px] font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer ${
-            isDoorOpen
+          isDoorOpen
             ? 'bg-amber-400 text-slate-950 ring-4 ring-amber-200'
             : 'bg-white/95 text-slate-800 hover:bg-sky-50 border border-sky-200'
         }`}
       >
         {isDoorOpen ? (
-            <>
-              <DoorOpen className="w-4 h-4 text-amber-700" />
-              <span>Door Open (Close)</span>
-            </>
+          <>
+            <DoorOpen className="w-4 h-4 text-amber-900" />
+            <span>Close Door</span>
+          </>
         ) : (
-            <>
-              <DoorClosed className="w-4 h-4 text-sky-600" />
-              <span>Door Closed (Open)</span>
-            </>
+          <>
+            <DoorClosed className="w-4 h-4 text-sky-600" />
+            <span>Open Door</span>
+          </>
         )}
       </button>
 
@@ -59,13 +59,13 @@ export const QuickControlsOverlay: React.FC<QuickControlsOverlayProps> = ({
       <button
         onClick={onTriggerMotion}
         className={`px-3.5 py-2 rounded-xl text-[14px] font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer ${
-            isMotionActive
-            ? 'bg-sky-500 text-white ring-4 ring-sky-200'
+          isMotionActive
+            ? 'bg-amber-400 text-slate-950 ring-4 ring-amber-200 animate-pulse'
             : 'bg-white/95 text-slate-800 hover:bg-sky-50 border border-sky-200'
         }`}
       >
-        <Footprints className="w-4 h-4 text-sky-500" />
-        <span>{isMotionActive ? 'Motion in Foyer' : 'Simulate Motion'}</span>
+        <Footprints className={`w-4 h-4 ${isMotionActive ? 'text-amber-900' : 'text-sky-500'}`} />
+        <span>{isMotionActive ? 'Motion in Foyer' : 'Walk through Foyer'}</span>
       </button>
     </div>
   );
