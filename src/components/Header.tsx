@@ -34,31 +34,29 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center gap-6 text-[16px] font-medium text-slate-600">
-            <button
-              onClick={() => setActiveTab('floorplan')}
-              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 cursor-pointer ${
-                activeTab === 'floorplan' ? 'text-sky-600 border-sky-500 font-semibold' : 'border-transparent'
-              }`}
-            >
-              Floor Plan
-            </button>
-            <button
-              onClick={() => setActiveTab('sensors')}
-              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 cursor-pointer ${
-                activeTab === 'sensors' ? 'text-sky-600 border-sky-500 font-semibold' : 'border-transparent'
-              }`}
-            >
-              Ring Devices
-            </button>
-            <button
-              onClick={() => setActiveTab('privacy')}
-              className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 cursor-pointer ${
-                activeTab === 'privacy' ? 'text-sky-600 border-sky-500 font-semibold' : 'border-transparent'
-              }`}
-            >
-              Privacy
-            </button>
+          <nav className="hidden md:flex items-center gap-4 text-[16px] font-medium text-slate-600">
+            {[
+              { id: 'floorplan', label: 'Floor Plan' },
+              { id: 'routine', label: 'Daily Routine' },
+              { id: 'sensors', label: 'Ring Devices' },
+              { id: 'privacy', label: 'Privacy' },
+            ].map((item, index) => (
+              <React.Fragment key={item.id}>
+                {index > 0 && (
+                  <div className="h-4 w-px bg-slate-200 shrink-0" aria-hidden="true" />
+                )}
+                <button
+                  onClick={() => setActiveTab(item.id)}
+                  className={`hover:text-sky-600 transition-colors whitespace-nowrap shrink-0 py-2 border-b-2 cursor-pointer ${
+                    activeTab === item.id
+                      ? 'text-sky-600 border-sky-500 font-semibold'
+                      : 'border-transparent'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              </React.Fragment>
+            ))}
           </nav>
 
           {/* Settings */}
