@@ -32,7 +32,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
           eventType: 'motion_detected' as const,
           description: 'Movement detected near the front entrance.',
         };
-      case 'doorbell':
+      case 'video_doorbell':
         return {
           eventType: 'ding' as const,
           description: 'Doorbell chime pressed at front porch.',
@@ -72,7 +72,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
     const now = Date.now();
 
     let rawType = 'motion_detected';
-    if (device?.kind === 'doorbell') {
+    if (device?.kind === 'video_doorbell') {
       rawType = 'ding';
     } else if (device?.kind === 'contact_sensor') {
       rawType = device.state === 'open' ? 'door_opened' : 'door_closed';
