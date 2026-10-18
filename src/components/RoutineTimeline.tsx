@@ -36,61 +36,32 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  const milestones = [
-    {
-      name: 'Morning Wake-Up & Foyer Motion',
-      target: `0${baseline.sleepWindowEndHour}:00 – ${baseline.morningRoutineDeadlineHour}:00 AM`,
-      actual: '07:18 AM (Foyer Motion Detected)',
-      delta: '4 min earlier than usual baseline (07:22 AM)',
-      status: 'nominal',
-      icon: <Sun className="w-5 h-5 text-amber-500" />
-    },
-    {
-      name: 'Morning Mail & Porch Visit',
-      target: `Under ${baseline.quickExitThresholdMinutes} min (Front Door)`,
-      actual: '09:15 AM (Door open for 3 min)',
-      delta: 'Quick porch check, door safely closed',
-      status: 'nominal',
-      icon: <DoorClosed className="w-5 h-5 text-sky-600" />
-    },
-    {
-      name: 'Front Door Safety & Latch Guard',
-      target: `Under ${baseline.doorAjarThresholdMinutes} min threshold`,
-      actual: 'Secure (0 door ajar warnings)',
-      delta: 'All exits properly closed and latched',
-      status: 'nominal',
-      icon: <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-    },
-    {
-      name: 'Night Curfew & Wandering Guard',
-      target: `No exits (${baseline.sleepWindowStartHour}:00 PM – 0${baseline.sleepWindowEndHour}:00 AM)`,
-      actual: '0 night door openings',
-      delta: 'Peaceful sleep, no wandering detected',
-      status: 'nominal',
-      icon: <Moon className="w-5 h-5 text-indigo-500" />
-    }
-  ];
-
   const filteredEvents = events.filter((evt) => {
     return evt.sensorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
            evt.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
            evt.timestamp.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  // Action badge label helper
+  // Auto-formats any action ('motion_detected', 'door_open') into clean Title Case
   const getActionBadge = (action: string) => {
-    switch (action.toLowerCase()) {
-      case 'opened':
-        return { label: 'Door Open', className: 'bg-amber-100 text-amber-900 border border-amber-200' };
-      case 'closed':
-        return { label: 'Door Closed', className: 'bg-slate-100 text-slate-700 border border-slate-200' };
-      case 'motion':
-        return { label: 'Motion Detected', className: 'bg-sky-100 text-sky-800 border border-sky-200' };
-      case 'ring':
-        return { label: 'Chime Ring', className: 'bg-indigo-100 text-indigo-800 border border-indigo-200' };
-      default:
-        return { label: action, className: 'bg-slate-100 text-slate-700 border border-slate-200' };
+    const act = action.toLowerCase();
+    
+    // Convert snake_case to Title Case: 'motion_detected' -> 'Motion Detected'
+    const label = action
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+
+    // Color by semantic category
+    if (act.includes('open')) {
+      return { label, className: 'bg-amber-100 text-amber-900 border border-amber-200' };
     }
+    if (act.includes('motion')) {
+      return { label, className: 'bg-sky-100 text-sky-800 border border-sky-200' };
+    }
+    if (act.includes('ring') || act.includes('chime')) {
+      return { label, className: 'bg-indigo-100 text-indigo-800 border border-indigo-200' };
+    }
+    return { label, className: 'bg-slate-100 text-slate-700 border border-slate-200' };
   };
 
   return (
@@ -115,10 +86,10 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
           <div>
             <h3 className="text-[18px] font-bold text-slate-900 flex items-center gap-2">
               <Cloud className="w-5 h-5 text-sky-500 fill-sky-100" />
-              <span>Today's Activity Timeline</span>
+              <span>Today's Timeline</span>
             </h3>
             <p className="text-[14px] text-slate-500 mt-1">
-              Visual daily routine and sensor events
+              Visual activity and sensor events
             </p>
           </div>
 
@@ -209,53 +180,13 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
         </div>
       </div>
 
-      {/* Routine Milestones Comparison Table */}
-      <div className="p-6 bg-white/95 border border-sky-100 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
-        <h3 className="text-[18px] font-bold text-slate-900">
-          Routine Milestones vs Today's Events
-        </h3>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-[14px]">
-            <thead className="border-b border-slate-200 text-slate-600 font-semibold">
-              <tr>
-                <th className="py-3 px-3">Milestone / Event</th>
-                <th className="py-3 px-3">Target Baseline</th>
-                <th className="py-3 px-3">Actual (Today)</th>
-                <th className="py-3 px-3">Deviation / Variance</th>
-                <th className="py-3 px-3 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {milestones.map((m, idx) => (
-                <tr key={idx} className="hover:bg-sky-50/40 transition-colors">
-                  <td className="py-3.5 px-3 font-semibold text-slate-800 flex items-center gap-2.5">
-                    {m.icon}
-                    <span>{m.name}</span>
-                  </td>
-                  <td className="py-3.5 px-3 text-slate-600 font-mono">{m.target}</td>
-                  <td className="py-3.5 px-3 text-slate-900 font-bold">{m.actual}</td>
-                  <td className="py-3.5 px-3 text-slate-600">{m.delta}</td>
-                  <td className="py-3.5 px-3 text-right">
-                    <span className="inline-flex items-center gap-1.5 text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Nominal</span>
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       {/* Discrete Sensor Trigger Event Log */}
       <div className="p-6 bg-white/95 border border-sky-100 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 className="text-[18px] font-bold text-slate-900">Sensor Activity Log</h3>
+            <h3 className="text-[18px] font-bold text-slate-900">Activity Log</h3>
             <p className="text-[14px] text-slate-500 mt-1">
-              Real-time log of entryway sensor activations for today
+              Real-time monitoring of sensor activations
             </p>
           </div>
 
