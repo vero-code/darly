@@ -1,4 +1,4 @@
-import type { RingEntrywayDevice } from './types/devices';
+import type { RingEntrywayDevice, SensorEventLog } from './types/devices';
 import type { ResidentProfile } from './types/profile';
 
 export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
@@ -60,3 +60,54 @@ export const DEFAULT_RESIDENT_PROFILE: ResidentProfile = {
     phone: '911',
   },
 };
+
+export const DEFAULT_HISTORICAL_EVENTS: SensorEventLog[] = [
+  {
+    id: 'evt-01',
+    deviceId: 'darly-motion-detector',
+    sensorName: 'Ring Alarm Motion Detector',
+    action: 'motion_detected',
+    timestamp: '07:22 AM',
+    durationSeconds: 15, // Morning wake up & first foyer movement
+  },
+  {
+    id: 'evt-02',
+    deviceId: 'darly-contact-sensor',
+    sensorName: 'Ring Alarm Contact Sensor',
+    action: 'opened',
+    timestamp: '09:15 AM',
+    durationSeconds: 45, // Stepped out to porch to collect morning mail
+  },
+  {
+    id: 'evt-03',
+    deviceId: 'darly-video-doorbell',
+    sensorName: 'Ring Video Doorbell',
+    action: 'motion_detected',
+    timestamp: '09:15 AM',
+    durationSeconds: 40, // Porch motion while collecting mail
+  },
+  {
+    id: 'evt-04',
+    deviceId: 'darly-contact-sensor',
+    sensorName: 'Ring Alarm Contact Sensor',
+    action: 'closed',
+    timestamp: '09:16 AM',
+    durationSeconds: 0, // Front door closed and securely latched
+  },
+  {
+    id: 'evt-05',
+    deviceId: 'darly-video-doorbell',
+    sensorName: 'Ring Video Doorbell',
+    action: 'motion_detected',
+    timestamp: '11:40 AM',
+    durationSeconds: 30, // Courier delivery on porch (door remained closed)
+  },
+  {
+    id: 'evt-06',
+    deviceId: 'darly-video-doorbell',
+    sensorName: 'Ring Video Doorbell',
+    action: 'ring',
+    timestamp: '01:15 PM',
+    durationSeconds: 5, // Doorbell chime ring / check-in
+  },
+];
