@@ -129,7 +129,7 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
 
               {/* Morning Routine Window: sleepWindowEndHour - morningRoutineDeadlineHour */}
               <div 
-                className="absolute top-0 bottom-0 bg-sky-200/50 border-x border-sky-300 flex items-center justify-center pointer-events-none"
+                className="absolute top-0 bottom-0 bg-sky-200/50 border-r border-sky-300 flex items-center justify-center pointer-events-none"
                 style={{ 
                   left: `${(baseline.sleepWindowEndHour / 24) * 100}%`, 
                   width: `${((baseline.morningRoutineDeadlineHour - baseline.sleepWindowEndHour) / 24) * 100}%` 
@@ -140,8 +140,11 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
 
               {/* Evening Calm: 19:30 - sleepWindowStartHour */}
               <div 
-                className="absolute top-0 bottom-0 bg-sky-200/50 border-x border-sky-300 flex items-center justify-center pointer-events-none"
-                style={{ left: '81.2%', width: `${((baseline.sleepWindowStartHour - 19.5) / 24) * 100}%` }}
+                className="absolute top-0 bottom-0 bg-sky-200/50 border-l border-sky-300 flex items-center justify-center pointer-events-none"
+                style={{ 
+                  left: `${(19.5 / 24) * 100}%`, 
+                  right: `${((24 - baseline.sleepWindowStartHour) / 24) * 100}%` 
+                }}
               >
                 <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Evening Calm</span>
               </div>
@@ -149,7 +152,9 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
               {/* Night Sleep: sleepWindowStartHour - 24:00 */}
               <div 
                 className="absolute right-0 top-0 bottom-0 bg-indigo-100/60 border-l border-indigo-200 flex items-center justify-center pointer-events-none"
-                style={{ left: `${(baseline.sleepWindowStartHour / 24) * 100}%`, width: `${((24 - baseline.sleepWindowStartHour) / 24) * 100}%` }}
+                style={{ 
+                  width: `${((24 - baseline.sleepWindowStartHour) / 24) * 100}%` 
+                }}
               >
                 <span className="text-[14px] font-semibold text-indigo-700 hidden sm:inline">Night Sleep</span>
               </div>
