@@ -149,38 +149,39 @@ export const CareScenariosPanel: React.FC<CareScenariosPanelProps> = ({
       {/* Caregiver AI Inference Summary */}
       {activeScenario && (
         <div className={`p-4 rounded-xl border shadow-xs space-y-3 ${getInferenceBoxStyles(activeScenario.severity)}`}>
-          <div className="flex items-center justify-between text-[13px] font-bold uppercase tracking-wider">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Darly Ambient Analysis</span>
+          <div className="flex items-center justify-between text-[14px] font-bold tracking-wide">
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-sky-600 shrink-0" />
+              <span>Caregiver Insight</span>
             </span>
-            <span className="font-mono text-[12px] opacity-75">{activeScenario.category}</span>
           </div>
 
-          <p className="text-[14px] leading-snug font-medium">
+          <p className="text-[14px] leading-relaxed font-medium">
             {activeScenario.caregiverSummary}
           </p>
 
           {/* Sequential Events Timeline */}
           {activeScenario.events && activeScenario.events.length > 0 && (
             <div className="pt-2.5 border-t border-black/10 space-y-2">
-              <div className="text-[12px] font-bold text-slate-500 uppercase tracking-wide">
+              <div className="text-[14px] font-bold text-slate-600 uppercase tracking-wide">
                 Detected Signal Sequence:
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {activeScenario.events.map((evt, idx) => (
-                  <div key={idx} className="flex items-start justify-between gap-3 text-[13px] bg-white/90 p-2.5 rounded-xl border border-black/5 shadow-2xs">
-                    <div className="flex items-start gap-2.5 min-w-0">
-                      <div className="p-1 rounded-md bg-white shadow-xs shrink-0 mt-0.5">
-                        {getEventIcon(evt.eventType)}
-                      </div>
-                      <span className="font-semibold text-slate-800 leading-snug">
-                        {evt.description}
-                      </span>
+                  <div key={idx} className="flex items-start gap-2.5 text-[14px] bg-white/95 p-3 rounded-xl border border-black/5 shadow-2xs">
+                    <div className="p-1.5 rounded-lg bg-slate-50 border border-slate-200/80 shadow-2xs shrink-0 mt-0.5">
+                      {getEventIcon(evt.eventType)}
                     </div>
-                    <span className="font-mono text-slate-600 text-[12px] shrink-0 font-semibold bg-slate-100/90 px-2 py-0.5 rounded-md self-start">
-                      {evt.relativeTime}
-                    </span>
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono text-slate-500 text-[12px] font-semibold bg-slate-100 px-2 py-0.5 rounded-md">
+                          {evt.relativeTime}
+                        </span>
+                      </div>
+                      <p className="font-semibold text-slate-800 leading-snug text-[14px]">
+                        {evt.description}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>

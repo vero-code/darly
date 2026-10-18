@@ -108,6 +108,38 @@ export const DEFAULT_HISTORICAL_EVENTS: SensorEventLog[] = [
     sensorName: 'Ring Video Doorbell',
     action: 'ring',
     timestamp: '01:15 PM',
-    durationSeconds: 5, // Doorbell chime ring / check-in
+    durationSeconds: 5, // Doorbell chime ring / visitor arrival
+  },
+  {
+    id: 'evt-07',
+    deviceId: 'darly-motion-detector',
+    sensorName: 'Ring Alarm Motion Detector',
+    action: 'motion_detected',
+    timestamp: '01:15 PM',
+    durationSeconds: 15, // Foyer motion approaching door
+  },
+  {
+    id: 'evt-08',
+    deviceId: 'darly-contact-sensor',
+    sensorName: 'Ring Alarm Contact Sensor',
+    action: 'opened',
+    timestamp: '01:16 PM',
+    durationSeconds: 30, // Front door opened to greet visitor
+  },
+  {
+    id: 'evt-09',
+    deviceId: 'darly-contact-sensor',
+    sensorName: 'Ring Alarm Contact Sensor',
+    action: 'closed',
+    timestamp: '01:16 PM',
+    durationSeconds: 0, // Door closed and securely latched
+  },
+  {
+    id: 'evt-10',
+    deviceId: 'darly-motion-detector',
+    sensorName: 'Ring Alarm Motion Detector',
+    action: 'motion_detected',
+    timestamp: '01:17 PM',
+    durationSeconds: 15, // Movement inside returning to living room
   },
 ];
