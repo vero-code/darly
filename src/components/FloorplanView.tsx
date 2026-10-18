@@ -5,18 +5,23 @@ import { ResidentInfoBar } from './ResidentInfoBar';
 import { House3DView } from './House3DView';
 import {
   Box,
+  Volume2,
 } from 'lucide-react';
 
 interface FloorplanViewProps {
   sensors: RingEntrywayDevice[];
   onToggleSensor: (sensorId: string) => void;
   profile: ResidentProfile;
+  onSendChime: () => void;
+  lastChimeSentTime: string | null;
 }
 
 export const FloorplanView: React.FC<FloorplanViewProps> = ({
   sensors,
   onToggleSensor,
   profile,
+  onSendChime,
+  lastChimeSentTime,
 }) => {
   const [selectedSensorId, setSelectedSensorId] = useState<string | null>('darly-contact-sensor');
 
@@ -54,6 +59,34 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
               selectedSensorId={selectedSensorId}
               onSelectSensor={(id) => setSelectedSensorId(id)}
             />
+          </div>
+        </div>
+
+        {/* Telemetry Panel */}
+        <div className="lg:col-span-4 bg-white/95 border border-sky-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-6">
+          {/* Ambient In-Home Chime Action Box */}
+          <div className="p-4 bg-gradient-to-br from-sky-50 to-blue-50/70 border border-sky-200 rounded-2xl space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[16px] font-bold text-slate-800 flex items-center gap-2">
+                <Volume2 className="w-5 h-5 text-sky-600" />
+                <span>Gentle In-Home Chime</span>
+              </span>
+            </div>
+            <p className="text-[14px] text-slate-600 leading-relaxed">
+              {`Plays a soft, pleasant chime in ${profile.name.split(' ')[0]}'s entryway for a gentle wellness check.`}
+            </p>
+            <button
+              onClick={onSendChime}
+              className="w-full py-2.5 px-3 bg-white hover:bg-sky-50 text-sky-700 border border-sky-300 rounded-xl text-[14px] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+            >
+              <Volume2 className="w-4 h-4" />
+              <span>Send Gentle Chime</span>
+            </button>
+            {lastChimeSentTime && (
+              <div className="text-[14px] text-slate-500 text-center">
+                Last chime sent at {lastChimeSentTime}
+              </div>
+            )}
           </div>
         </div>
       </div>
