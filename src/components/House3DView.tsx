@@ -44,6 +44,7 @@ export const House3DView: React.FC<House3DViewProps> = ({
   // Smooth camera targets
   const targetCameraPos = useRef<THREE.Vector3>(new THREE.Vector3(7.5, 5.5, 7.5));
   const targetLookAt = useRef<THREE.Vector3>(new THREE.Vector3(0, 1.4, 0));
+  const isTransitioningCamera = useRef<boolean>(false);
 
   // Initialize Three.js Scene
   useEffect(() => {
@@ -84,6 +85,11 @@ export const House3DView: React.FC<House3DViewProps> = ({
     controls.maxDistance = 20;
     controls.target.set(0, 1.4, 0);
     controlsRef.current = controls;
+
+    // Release camera to user as soon as mouse interaction begins
+    controls.addEventListener('start', () => {
+      isTransitioningCamera.current = false;
+    });
 
     // 5. Lighting Rig (Crisp direct sunlight + balanced studio fill)
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 1.4);
@@ -439,9 +445,19 @@ export const House3DView: React.FC<House3DViewProps> = ({
       animationFrameId = requestAnimationFrame(animate);
       const delta = clock.getDelta();
 
-      // Smooth camera position transitions
-      camera.position.lerp(targetCameraPos.current, 0.06);
-      controls.target.lerp(targetLookAt.current, 0.06);
+      // Smooth camera position transitions (only when flying to a target)
+      if (isTransitioningCamera.current) {
+        camera.position.lerp(targetCameraPos.current, 0.06);
+        controls.target.lerp(targetLookAt.current, 0.06);
+
+        if(
+          camera.position.distanceTo(targetCameraPos.current) < 0.05 &&
+          controls.target.distanceTo(targetLookAt.current) < 0.05
+        ) {
+          isTransitioningCamera.current = false;
+        }
+      }
+      
       controls.update();
 
       // Smooth door swinging
@@ -534,6 +550,7 @@ export const House3DView: React.FC<House3DViewProps> = ({
   // Focus Camera onto one of the 3 Ring Devices
   const handleFocusDevice = (dev: 'all' | 'doorbell' | 'contact' | 'motion') => {
     setActiveDeviceFocus(dev);
+    isTransitioningCamera.current = true;
 
     if (dev === 'all') {
       targetCameraPos.current.set(7.5, 5.5, 7.5);
