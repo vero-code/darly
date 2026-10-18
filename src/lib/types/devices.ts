@@ -15,3 +15,12 @@ export interface RingEntrywayDevice {
   careRole?: string
   simulated: boolean
 }
+
+export interface SensorEventLog {
+  id: string;
+  deviceId: string;
+  sensorName: string;
+  action: 'opened' | 'closed' | 'motion_detected' | 'ring';
+  timestamp: string;
+  durationSeconds?: number;
+}
