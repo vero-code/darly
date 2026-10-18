@@ -2,13 +2,9 @@ import React, { useEffect, useState } from 'react';
 import type { SensorEventLog } from '@/lib/types/devices';
 import type { ResidentProfile } from '@/lib/types/profile';
 import type { RoutineBaselineConfig } from '@/lib/engine/routine-baseline';
-import { parseTimestampToPercent, getEventGlyph } from '@/utils/timelineUtils';
+import { clusterTimelineEvents, getEventGlyph } from '@/utils/timelineUtils';
 import {
   Clock,
-  Sun,
-  Moon,
-  CheckCircle2,
-  DoorClosed,
   Search,
   Cloud,
 } from 'lucide-react';
@@ -26,6 +22,7 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentTime, setCurrentTime] = useState<string>('');
+  const clusters = clusterTimelineEvents(events, 15);
 
   useEffect(() => {
     const updateTime = () => {
@@ -110,59 +107,80 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
           <div className="relative h-16">
             {/* Background Track with rounded clip */}
             <div className="absolute inset-0 bg-gradient-to-r from-sky-50/70 via-blue-50/50 to-sky-50/70 rounded-2xl border border-sky-200 overflow-hidden shadow-inner">
-              {/* Curfew block: 00:00 - 06:00 (25% width) */}
+              {/* Curfew block: 00:00 - sleepWindowEndHour */}
               <div 
                 className="absolute left-0 top-0 bottom-0 bg-indigo-100/60 border-r border-indigo-200 flex items-center justify-center pointer-events-none"
-                style={{ width: '25%' }}
+                style={{ width: `${(baseline.sleepWindowEndHour / 24) * 100}%` }}
               >
                 <span className="text-[14px] font-semibold text-indigo-700">Night Rest</span>
               </div>
 
-              {/* Morning Routine Window: 06:00 - 10:00 */}
+              {/* Morning Routine Window: sleepWindowEndHour - morningRoutineDeadlineHour */}
               <div 
                 className="absolute top-0 bottom-0 bg-sky-200/50 border-x border-sky-300 flex items-center justify-center pointer-events-none"
-                style={{ left: '25%', width: '16.7%' }}
+                style={{ 
+                  left: `${(baseline.sleepWindowEndHour / 24) * 100}%`, 
+                  width: `${((baseline.morningRoutineDeadlineHour - baseline.sleepWindowEndHour) / 24) * 100}%` 
+                }}
               >
                 <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Morning Routine</span>
               </div>
 
-              {/* Evening Calm: 19:30 - 22:00 */}
+              {/* Evening Calm: 19:30 - sleepWindowStartHour */}
               <div 
                 className="absolute top-0 bottom-0 bg-sky-200/50 border-x border-sky-300 flex items-center justify-center pointer-events-none"
-                style={{ left: '81.2%', width: '10.5%' }}
+                style={{ left: '81.2%', width: `${((baseline.sleepWindowStartHour - 19.5) / 24) * 100}%` }}
               >
                 <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Evening Calm</span>
               </div>
 
-              {/* Curfew block: 22:30 - 24:00 */}
+              {/* Night Sleep: sleepWindowStartHour - 24:00 */}
               <div 
                 className="absolute right-0 top-0 bottom-0 bg-indigo-100/60 border-l border-indigo-200 flex items-center justify-center pointer-events-none"
-                style={{ left: '93.7%', width: '6.3%' }}
+                style={{ left: `${(baseline.sleepWindowStartHour / 24) * 100}%`, width: `${((24 - baseline.sleepWindowStartHour) / 24) * 100}%` }}
               >
                 <span className="text-[14px] font-semibold text-indigo-700 hidden sm:inline">Night Sleep</span>
               </div>
             </div>
 
-            {/* Live Sensor Event Glyphs outside the overflow clip */}
-            {events.map((evt) => {
-              const percent = parseTimestampToPercent(evt.timestamp);
-              const glyph = getEventGlyph(evt);
-              return (
-                <div 
-                  key={evt.id}
-                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 group cursor-pointer transition-transform hover:scale-110"
-                  style={{ left: `${percent}%` }}
-                >
-                  <div className={`w-8 h-8 rounded-full ${glyph.bg} border-2 border-white flex items-center justify-center shadow-md`}>
-                    {glyph.icon}
-                  </div>
-                  {/* Tooltip on hover (visible and not cut off) */}
-                  <div className="hidden group-hover:block absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[14px] font-medium py-1.5 px-3 rounded-xl whitespace-nowrap shadow-2xl z-50 pointer-events-none">
-                    {glyph.label}
-                  </div>
+            {/* Live Sensor Event Clusters outside the overflow clip */}
+            {clusters.map((cluster) => (
+              <div 
+                key={cluster.id}
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 group cursor-pointer transition-transform hover:scale-110"
+                style={{ left: `${cluster.timePercent}%` }}
+              >
+                <div className={`relative w-8 h-8 rounded-full ${cluster.primaryGlyph.bg} border-2 border-white flex items-center justify-center shadow-md`}>
+                  {cluster.primaryGlyph.icon}
+                  {cluster.events.length > 1 && (
+                    <span className="absolute -top-1.5 -right-1.5 bg-sky-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white shadow">
+                      {cluster.events.length}
+                    </span>
+                  )}
                 </div>
-              );
-            })}
+
+                {/* Tooltip on hover (supports single and clustered events) */}
+                <div className="hidden group-hover:block absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[13px] py-2 px-3.5 rounded-xl whitespace-nowrap shadow-2xl z-50 pointer-events-none">
+                  {cluster.events.length === 1 ? (
+                    <div className="font-medium">{cluster.primaryGlyph.label}</div>
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="font-bold text-[12px] text-sky-300 border-b border-slate-700 pb-1">
+                        {cluster.events[0].timestamp} · {cluster.events.length} Events
+                      </div>
+                      {cluster.events.map((e) => {
+                        const g = getEventGlyph(e);
+                        return (
+                          <div key={e.id} className="text-[12px] text-slate-200">
+                            {g.label}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Time axis marks (min 14px) */}

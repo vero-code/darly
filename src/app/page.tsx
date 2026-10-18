@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { RingEntrywayDevice } from '@/lib/types/devices';
+import type { RingEntrywayDevice, SensorEventLog } from '@/lib/types/devices';
 import type { ResidentProfile } from '@/lib/types/profile';
 import {
   SIMULATED_DEVICES,
-  DEFAULT_RESIDENT_PROFILE
+  DEFAULT_RESIDENT_PROFILE,
+  DEFAULT_HISTORICAL_EVENTS
 } from '@/lib/mock-data';
+import { RoutineBaselineConfig, DEFAULT_BASELINE } from '@/lib/engine/routine-baseline';
 import { Header } from "@/components/Header";
 import { FloorplanView } from "@/components/FloorplanView";
 import { SettingsModal } from "@/components/SettingsModal";
@@ -14,12 +16,15 @@ import { SensorGrid } from '@/components/SensorGrid';
 import { PrivacyInspector } from "@/components/PrivacyInspector";
 import { FloatingCloudsBackground } from "@/components/CloudElements";
 import { Footer } from "@/components/Footer";
-import { ambientAudio } from '@/utils/audioChime';
 import { ChimeModal } from '@/components/ChimeModal';
+import { RoutineTimeline } from '@/components/RoutineTimeline';
+import { ambientAudio } from '@/utils/audioChime';
 
 export default function Home() {
   const [sensors, setSensors] = useState<RingEntrywayDevice[]>(SIMULATED_DEVICES);
+  const [baseline, setBaseline] = useState<RoutineBaselineConfig>(DEFAULT_BASELINE);
   const [profile, setProfile] = useState<ResidentProfile>(DEFAULT_RESIDENT_PROFILE);
+  const [events, setEvents] = useState<SensorEventLog[]>(DEFAULT_HISTORICAL_EVENTS);
 
   const [activeTab, setActiveTab] = useState<string>('floorplan');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -42,6 +47,19 @@ export default function Home() {
     const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setLastChimeSentTime(timeNow);
     setIsChimeModalOpen(true);
+
+    // Add chime event to log
+    setEvents((prev) => [
+      {
+        id: `evt-${Date.now()}`,
+        deviceId: 'darly-in-home-chime',
+        sensorName: 'In-Home Ring Chime',
+        action: 'ring',
+        timestamp: timeNow,
+        durationSeconds: 3,
+      },
+      ...prev,
+    ]);
   };
 
   const handleSaveProfile = (updatedProfile: ResidentProfile) => {
@@ -53,8 +71,10 @@ export default function Home() {
     }
   };
 
-  // Toggle sensor state manually or via Floor Plan with auto-reset for transient events
+  // Toggle sensor state manually or via Floor Plan
   const handleToggleSensor = (sensorId: string) => {
+    const target = sensors.find((s) => s.id === sensorId);
+
     setSensors((prev) =>
       prev.map((s) => {
         if (s.id !== sensorId) return s;
@@ -80,8 +100,7 @@ export default function Home() {
       })
     );
 
-    // Auto-reset transient devices (doorbell chime and motion pulse) back to closed after 3 seconds
-    const target = sensors.find((s) => s.id === sensorId);
+    // Auto-reset transient devices
     if (target && (target.kind === 'video_doorbell' || target.kind === 'motion_sensor') && target.state !== 'open') {
       setTimeout(() => {
         setSensors((current) =>
@@ -90,6 +109,29 @@ export default function Home() {
           )
         );
       }, 3000);
+    }
+
+    // Record sensor activation in activity log
+    if (target) {
+      const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const nextAction: SensorEventLog['action'] = 
+        target.kind === 'motion_sensor'
+          ? 'motion_detected'
+          : target.kind === 'video_doorbell'
+            ? 'ring'
+            : (target.state === 'open' ? 'closed' : 'opened');
+
+      setEvents((prev) => [
+        {
+          id: `evt-${Date.now()}`,
+          deviceId: target.id,
+          sensorName: target.name,
+          action: nextAction,
+          timestamp: timeNow,
+          durationSeconds: target.kind === 'motion_sensor' ? 15 : target.kind === 'video_doorbell' ? 5 : 45,
+        },
+        ...prev,
+      ]);
     }
   };
 
@@ -129,6 +171,15 @@ export default function Home() {
             lastChimeSentTime={lastChimeSentTime}
           />
         )}
+
+        {activeTab === 'routine' && (
+          <RoutineTimeline
+            events={events}
+            baseline={baseline}
+            profile={profile}
+          />
+        )}
+
         {activeTab === 'sensors' && (
           <SensorGrid
             sensors={sensors}
