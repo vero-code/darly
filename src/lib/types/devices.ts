@@ -23,4 +23,5 @@ export interface SensorEventLog {
   action: 'opened' | 'closed' | 'motion_detected' | 'ring';
   timestamp: string;
   durationSeconds?: number;
+  openedAt?: number;
 }

@@ -22,6 +22,7 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentTime, setCurrentTime] = useState<string>('');
+  const [stopwatchNow, setStopwatchNow] = useState<number>(() => Date.now());
   const clusters = clusterTimelineEvents(events, 15);
 
   useEffect(() => {
@@ -32,6 +33,17 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
     const interval = setInterval(updateTime, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  // Live stopwatch tick for actively open door events
+  useEffect(() => {
+    const hasLiveEvent = events.some((e) => e.action === 'opened' && !e.durationSeconds && e.openedAt);
+    if (!hasLiveEvent) return;
+
+    const timer = setInterval(() => {
+      setStopwatchNow(Date.now());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [events]);
 
   const filteredEvents = events.filter((evt) => {
     return evt.sensorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -73,7 +85,7 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
 
         <div className="flex items-center gap-2 text-[14px] text-sky-800 font-semibold bg-sky-50 px-3.5 py-1.5 rounded-xl border border-sky-100">
           <Clock className="w-4 h-4 text-sky-600" />
-          <span>Current Time: {currentTime || 'Live'}</span>
+          <span>Time: {currentTime || 'Live'}</span>
         </div>
       </div>
 
@@ -242,8 +254,22 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
                         {badge.label}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-right text-slate-600 font-sans">
-                      {evt.durationSeconds ? `${evt.durationSeconds}s` : 'Active'}
+                    <td className="py-3 px-3 text-right font-sans">
+                      {evt.durationSeconds && evt.durationSeconds > 0 ? (
+                        <span className="font-semibold text-slate-700">{evt.durationSeconds}s</span>
+                      ) : evt.action === 'closed' ? (
+                        <span className="text-slate-400">—</span>
+                      ) : evt.openedAt ? (
+                        <span className="inline-flex items-center gap-1.5 font-mono font-semibold text-[14px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-300 shadow-2xs">
+                          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                          {Math.max(1, Math.floor((stopwatchNow - evt.openedAt) / 1000))}s
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 font-semibold text-[14px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-300">
+                          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                          Active
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );

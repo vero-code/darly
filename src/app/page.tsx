@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { RingEntrywayDevice, SensorEventLog } from '@/lib/types/devices';
 import type { ResidentProfile } from '@/lib/types/profile';
 import {
@@ -25,6 +25,10 @@ export default function Home() {
   const [baseline, setBaseline] = useState<RoutineBaselineConfig>(DEFAULT_BASELINE);
   const [profile, setProfile] = useState<ResidentProfile>(DEFAULT_RESIDENT_PROFILE);
   const [events, setEvents] = useState<SensorEventLog[]>(DEFAULT_HISTORICAL_EVENTS);
+
+  // Stopwatch tracking for active open door sensors
+  const sensorOpenTimestamps = useRef<Record<string, number>>({});
+  const sensorOpenEventIds = useRef<Record<string, string>>({});
 
   const [activeTab, setActiveTab] = useState<string>('floorplan');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -74,13 +78,13 @@ export default function Home() {
   // Toggle sensor state manually or via Floor Plan
   const handleToggleSensor = (sensorId: string) => {
     const target = sensors.find((s) => s.id === sensorId);
+    if (!target) return;
+
+    const newState: RingEntrywayDevice['state'] = target.state === 'open' ? 'closed' : 'open';
 
     setSensors((prev) =>
       prev.map((s) => {
         if (s.id !== sensorId) return s;
-
-        // Toggle state
-        const newState: RingEntrywayDevice['state'] = s.state === 'open' ? 'closed' : 'open';
 
         // Play corresponding sound
         if (newState === 'open') {
@@ -101,7 +105,7 @@ export default function Home() {
     );
 
     // Auto-reset transient devices
-    if (target && (target.kind === 'video_doorbell' || target.kind === 'motion_sensor') && target.state !== 'open') {
+    if ((target.kind === 'video_doorbell' || target.kind === 'motion_sensor') && target.state !== 'open') {
       setTimeout(() => {
         setSensors((current) =>
           current.map((dev) =>
@@ -111,32 +115,123 @@ export default function Home() {
       }, 3000);
     }
 
-    // Record sensor activation in activity log
-    if (target) {
-      const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const nextAction: SensorEventLog['action'] = 
-        target.kind === 'motion_sensor'
-          ? 'motion_detected'
-          : target.kind === 'video_doorbell'
-            ? 'ring'
-            : (target.state === 'open' ? 'closed' : 'opened');
+    // Record sensor activation in activity log with stopwatch timing
+    const now = Date.now();
+    const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    if (target.kind === 'motion_sensor') {
       setEvents((prev) => [
         {
-          id: `evt-${Date.now()}`,
+          id: `evt-${now}`,
           deviceId: target.id,
           sensorName: target.name,
-          action: nextAction,
+          action: 'motion_detected',
           timestamp: timeNow,
-          durationSeconds: target.kind === 'motion_sensor' ? 15 : target.kind === 'video_doorbell' ? 5 : 45,
+          durationSeconds: 15,
         },
         ...prev,
       ]);
+    } else if (target.kind === 'video_doorbell') {
+      setEvents((prev) => [
+        {
+          id: `evt-${now}`,
+          deviceId: target.id,
+          sensorName: target.name,
+          action: 'ring',
+          timestamp: timeNow,
+          durationSeconds: 5,
+        },
+        ...prev,
+      ]);
+    } else {
+      // Contact / Door sensor
+      if (newState === 'open') {
+        const openEventId = `evt-${now}`;
+        sensorOpenTimestamps.current[target.id] = now;
+        sensorOpenEventIds.current[target.id] = openEventId;
+
+        setEvents((prev) => [
+          {
+            id: openEventId,
+            deviceId: target.id,
+            sensorName: target.name,
+            action: 'opened',
+            timestamp: timeNow,
+            openedAt: now,
+            durationSeconds: undefined,
+          },
+          ...prev,
+        ]);
+      } else {
+        // Door closed - measure elapsed duration with stopwatch
+        const startTime = sensorOpenTimestamps.current[target.id];
+        const openEventId = sensorOpenEventIds.current[target.id];
+        const elapsedSeconds = startTime ? Math.max(1, Math.round((now - startTime) / 1000)) : 1;
+
+        delete sensorOpenTimestamps.current[target.id];
+        delete sensorOpenEventIds.current[target.id];
+
+        setEvents((prev) => {
+          // Update matching open event with measured seconds
+          const updated = prev.map((evt) =>
+            evt.id === openEventId
+              ? { ...evt, durationSeconds: elapsedSeconds }
+              : evt
+          );
+
+          return [
+            {
+              id: `evt-${now}`,
+              deviceId: target.id,
+              sensorName: target.name,
+              action: 'closed',
+              timestamp: timeNow,
+              durationSeconds: 0,
+            },
+            ...updated,
+          ];
+        });
+      }
     }
   };
 
   // Reset all sensors
   const handleResetAllSensors = () => {
+    const now = Date.now();
+    const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // Finalize any currently open sensors
+    const openSensorIds = Object.keys(sensorOpenTimestamps.current);
+    if (openSensorIds.length > 0) {
+      setEvents((prev) => {
+        let updated = [...prev];
+        openSensorIds.forEach((sId) => {
+          const startTime = sensorOpenTimestamps.current[sId];
+          const openEventId = sensorOpenEventIds.current[sId];
+          const elapsed = startTime ? Math.max(1, Math.round((now - startTime) / 1000)) : 1;
+          const target = sensors.find((s) => s.id === sId);
+
+          updated = updated.map((evt) =>
+            evt.id === openEventId ? { ...evt, durationSeconds: elapsed } : evt
+          );
+
+          if (target) {
+            updated.unshift({
+              id: `evt-${now}-${sId}`,
+              deviceId: target.id,
+              sensorName: target.name,
+              action: 'closed',
+              timestamp: timeNow,
+              durationSeconds: 0,
+            });
+          }
+        });
+        return updated;
+      });
+      sensorOpenTimestamps.current = {};
+      sensorOpenEventIds.current = {};
+    }
+
     setSensors((prev) =>
       prev.map((s) => ({
         ...s,
