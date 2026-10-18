@@ -56,9 +56,9 @@ export const ChimeModal: React.FC<ChimeModalProps> = ({
         </div>
         {/* Title & Description */}
         <div className="space-y-1.5">
-          <h3 className="text-[20px] font-bold text-slate-900">Gentle Chime Sent</h3>
+          <h3 className="text-[20px] font-bold text-slate-900">In-Home Chime Played</h3>
           <p className="text-[15px] text-slate-600 leading-relaxed max-w-xs mx-auto">
-            {`A soft, soothing chime played on entryway speaker.`}
+            {`Soft chime played on ${firstName}'s entryway speaker.`}
           </p>
         </div>
         {/* Resident Action Simulation */}
@@ -81,7 +81,7 @@ export const ChimeModal: React.FC<ChimeModalProps> = ({
             onClick={() => ambientAudio.playGentleCheckinChime()}
             className="w-full py-2 text-[14px] font-semibold text-sky-700 hover:text-sky-800 transition-colors cursor-pointer"
           >
-            Replay Melody
+            Replay Chime
           </button>
         </div>
       </div>

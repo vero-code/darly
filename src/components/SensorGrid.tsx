@@ -134,8 +134,8 @@ export const SensorGrid: React.FC<SensorGridProps> = ({
                     <span className={`px-3 py-1 rounded-full text-[14px] font-bold ${
                       isOpen ? 'bg-amber-400 text-slate-900 animate-pulse' : 'bg-sky-100 text-sky-800'
                     }`}>
-                      {sensor.kind === 'video_doorbell' && (isOpen ? 'Ding' : 'Idle')}
-                      {sensor.kind === 'contact_sensor' && (isOpen ? 'Faulted (Open)' : 'Closed')}
+                      {sensor.kind === 'video_doorbell' && (isOpen ? 'Ringing...' : 'Standby')}
+                      {sensor.kind === 'contact_sensor' && (isOpen ? 'Open' : 'Closed')}
                       {sensor.kind === 'motion_sensor' && (isOpen ? 'Motion Detected' : 'Clear')}
                     </span>
                   </div>

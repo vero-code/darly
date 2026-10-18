@@ -92,11 +92,6 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
 
         {/* Telemetry Panel */}
         <div className="lg:col-span-4 bg-white/95 border border-sky-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-6">
-          {/* Care Scenarios Simulation Panel */}
-          <CareScenariosPanel
-            activeScenarioId={activeScenarioId}
-            onSelectScenario={handleSelectScenario}
-          />
           {/* Ambient In-Home Chime Action Box */}
           <div className="p-4 bg-gradient-to-br from-sky-50 to-blue-50/70 border border-sky-200 rounded-2xl space-y-3">
             <div className="flex items-center justify-between">
@@ -106,7 +101,7 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
               </span>
             </div>
             <p className="text-[14px] text-slate-600 leading-relaxed">
-              {`Plays a soothing melody in ${profile.name.split(' ')[0]}'s hallway for a calm wellness check.`}
+              {`Plays an ambient chime in ${profile.name.split(' ')[0]}'s hallway for a calm wellness check.`}
             </p>
             <button
               onClick={onSendChime}
@@ -121,6 +116,11 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
               </div>
             )}
           </div>
+          {/* Care Scenarios Simulation Panel */}
+          <CareScenariosPanel
+            activeScenarioId={activeScenarioId}
+            onSelectScenario={handleSelectScenario}
+          />
         </div>
       </div>
     </div>
