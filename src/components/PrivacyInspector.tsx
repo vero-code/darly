@@ -7,6 +7,7 @@ import {
   Copy, 
   Check, 
   Cpu,
+  Radio,
 } from 'lucide-react';
 import type { RingEntrywayDevice } from '@/lib/types/devices';
 import type { ScenarioEvent } from '@/lib/scenarios';
@@ -110,17 +111,47 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
 
   return (
     <div className="space-y-6">
-      {/* Editorial Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl bg-white/90 border border-sky-100 shadow-[0_4px_20px_-2px_rgba(0,0,0,0.03)] text-[16px] text-slate-700">
-        <div className="flex flex-wrap items-center gap-2 font-medium">
-          <span className="font-bold text-slate-900 text-[18px]">How Sensors Work</span>
-          <span className="text-slate-400">·</span>
-          <span>Dignified care without privacy intrusion</span>
+      {/* Editorial Header & Real Ring API Readiness Status */}
+      <div className="p-5 rounded-3xl bg-white/95 border border-sky-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 text-[16px] text-slate-700">
+          <div className="flex flex-wrap items-center gap-2 font-medium">
+            <span className="font-bold text-slate-900 text-[18px]">How Sensors Work</span>
+            <span className="text-slate-400">·</span>
+            <span>Dignified care without privacy intrusion</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-sky-800 font-semibold bg-sky-50 px-3.5 py-1.5 rounded-xl border border-sky-100 text-[14px]">
+            <ShieldCheck className="w-4 h-4 text-sky-600" />
+            <span>Only discrete door open/close events transmitted</span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 text-sky-800 font-semibold bg-sky-50 px-3.5 py-1.5 rounded-xl border border-sky-100 text-[14px]">
-          <ShieldCheck className="w-4 h-4 text-sky-600" />
-          <span>Only discrete door open/close events transmitted</span>
+        {/* Real Ring API Readiness Banner */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-emerald-50/70 via-sky-50/50 to-white border border-emerald-100/80 text-[14px]">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-white shadow-xs border border-emerald-200 text-emerald-800 font-bold text-[14px]">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <span>Ready for Real Ring API</span>
+            </div>
+
+            <div className="flex items-center gap-2 text-slate-700 font-medium text-[14px]">
+              <Radio className="w-4 h-4 text-emerald-600" />
+              <span>Active Webhook Listener:</span>
+              <code className="px-2 py-0.5 rounded-lg bg-white font-mono text-[14px] text-slate-900 border border-slate-200 shadow-xs">
+                /api/webhook
+              </code>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 text-slate-600 text-[14px]">
+            <span className="font-medium text-slate-700">Cloud API:</span>
+            <code className="px-2 py-0.5 rounded-lg bg-white font-mono text-[14px] text-sky-800 border border-sky-200/80 shadow-xs">
+              api.amazonvision.com
+            </code>
+          </div>
         </div>
       </div>
 
@@ -218,7 +249,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
           {/* Window 1: Raw Ring Webhook */}
           <div className="p-5 bg-slate-900 rounded-2xl font-mono text-[14px] overflow-x-auto text-sky-300 leading-relaxed shadow-inner">
             <div className="text-slate-400 text-[14px] mb-3 select-none">
-              // 1. Raw Ring Data
+              // 1. Raw Ring Webhook Event (api.amazonvision.com)
             </div>
             <pre>{rawJsonString}</pre>
           </div>
@@ -226,7 +257,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
           {/* Window 2: Normalized Darly Event */}
           <div className="p-5 bg-slate-900 rounded-2xl font-mono text-[14px] overflow-x-auto text-sky-300 leading-relaxed shadow-inner">
             <div className="text-slate-400 text-[14px] mb-3 select-none">
-              // 2. Darly Normalized Data
+              // 2. Darly Normalized Privacy Telemetry (Local Edge)
             </div>
             <pre>{jsonString}</pre>
           </div>
