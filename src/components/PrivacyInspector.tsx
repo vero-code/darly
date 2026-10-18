@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { RingEntrywayDevice } from '@/lib/types/devices';
 import type { ScenarioEvent } from '@/lib/scenarios';
+import { RING_DOCS_URLS } from '@/lib/constants/ringDocs';
 
 interface PrivacyInspectorProps {
   sensors: RingEntrywayDevice[];
@@ -268,7 +269,7 @@ export const PrivacyInspector: React.FC<PrivacyInspectorProps> = ({ sensors = []
       <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-100 text-[14px] text-slate-600 leading-relaxed text-center">
         <span className="font-semibold text-slate-800">Disclaimer:</span> Device names and features are referenced for prototype demonstration purposes. Hardware capabilities may vary by specific{' '}
         <a 
-          href="https://ring.com/support" 
+          href={RING_DOCS_URLS.default}
           target="_blank" 
           rel="noopener noreferrer"
           className="text-sky-600 underline underline-offset-4 decoration-sky-300 hover:decoration-sky-600 hover:text-sky-800 transition-colors cursor-pointer font-medium"

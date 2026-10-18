@@ -12,7 +12,9 @@ import {
   Activity,
   Radio,
   Search,
+  ExternalLink,
 } from 'lucide-react';
+import { RING_DOCS_URLS } from '@/lib/constants/ringDocs';
 
 interface SensorGridProps {
   sensors: RingEntrywayDevice[];
@@ -46,6 +48,19 @@ export const SensorGrid: React.FC<SensorGridProps> = ({
         );
       default:
         return <DoorClosed className="w-6 h-6" />;
+    }
+  };
+
+  const getDocInfo = (kind: string) => {
+    switch (kind) {
+      case 'video_doorbell':
+        return { url: RING_DOCS_URLS.doorbell, label: 'Ring Doorbell Specs & Docs' };
+      case 'contact_sensor':
+        return { url: RING_DOCS_URLS.contactSensor, label: 'Contact Sensor Specs & Docs' };
+      case 'motion_sensor':
+        return { url: RING_DOCS_URLS.motionDetector, label: 'Motion Detector Specs & Docs' };
+      default:
+        return { url: RING_DOCS_URLS.default, label: 'Ring Device Specs & Docs' };
     }
   };
 
@@ -114,6 +129,7 @@ export const SensorGrid: React.FC<SensorGridProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredSensors.map((sensor) => {
           const isOpen = sensor.state === 'open';
+          const docInfo = getDocInfo(sensor.kind);
 
           return (
             <div
@@ -187,9 +203,22 @@ export const SensorGrid: React.FC<SensorGridProps> = ({
                     </span>
                   </div>
                 </div>
+
+                {/* Ring Official Hardware Documentation Link */}
+                <div className="mt-4 pt-3 border-t border-slate-100">
+                  <a
+                    href={docInfo.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-sky-600 hover:text-sky-800 transition-colors cursor-pointer group"
+                  >
+                    <span>{docInfo.label}</span>
+                    <ExternalLink className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                </div>
               </div>
 
-              {/* Device-Specific Simulation Button */}
+              {/* Device Action Button */}
               {sensor.kind === 'video_doorbell' && (
                 <button
                   onClick={() => onToggleSensor(sensor.id)}
