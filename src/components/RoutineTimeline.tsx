@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { SensorEventLog } from '@/lib/types/devices';
 import type { ResidentProfile } from '@/lib/types/profile';
 import type { RoutineBaselineConfig } from '@/lib/engine/routine-baseline';
+import { parseTimestampToPercent, getEventGlyph } from '@/utils/timelineUtils';
 import {
   Clock,
   Sun,
@@ -10,8 +11,6 @@ import {
   DoorClosed,
   Search,
   Cloud,
-  Bell,
-  Volume2
 } from 'lucide-react';
 
 interface RoutineTimelineProps {
@@ -116,10 +115,10 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
           <div>
             <h3 className="text-[18px] font-bold text-slate-900 flex items-center gap-2">
               <Cloud className="w-5 h-5 text-sky-500 fill-sky-100" />
-              <span>24-Hour Activity Rhythm</span>
+              <span>Today's Activity Timeline</span>
             </h3>
             <p className="text-[14px] text-slate-500 mt-1">
-              Baseline schedule vs. today's live activity
+              Visual daily routine and sensor events
             </p>
           </div>
 
@@ -136,84 +135,63 @@ export const RoutineTimeline: React.FC<RoutineTimelineProps> = ({
         </div>
 
         {/* The 24-Hour Timeline Track */}
-        <div className="space-y-3 pt-2">
-          <div className="relative h-16 bg-gradient-to-r from-sky-50/70 via-blue-50/50 to-sky-50/70 rounded-2xl border border-sky-200 overflow-hidden shadow-inner">
-            {/* Curfew block: 00:00 - 06:00 (25% width) */}
-            <div 
-              className="absolute left-0 top-0 bottom-0 bg-indigo-100/60 border-r border-indigo-200 flex items-center justify-center"
-              style={{ width: '25%' }}
-            >
-              <span className="text-[14px] font-semibold text-indigo-700">Night Rest</span>
-            </div>
+        <div className="space-y-3 pt-6">
+          <div className="relative h-16">
+            {/* Background Track with rounded clip */}
+            <div className="absolute inset-0 bg-gradient-to-r from-sky-50/70 via-blue-50/50 to-sky-50/70 rounded-2xl border border-sky-200 overflow-hidden shadow-inner">
+              {/* Curfew block: 00:00 - 06:00 (25% width) */}
+              <div 
+                className="absolute left-0 top-0 bottom-0 bg-indigo-100/60 border-r border-indigo-200 flex items-center justify-center pointer-events-none"
+                style={{ width: '25%' }}
+              >
+                <span className="text-[14px] font-semibold text-indigo-700">Night Rest</span>
+              </div>
 
-            {/* Morning Routine Window: 06:00 - 10:00 */}
-            <div 
-              className="absolute top-0 bottom-0 bg-sky-200/50 border-x border-sky-300 flex items-center justify-center"
-              style={{ left: '25%', width: '16.7%' }}
-            >
-              <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Morning Routine</span>
-            </div>
+              {/* Morning Routine Window: 06:00 - 10:00 */}
+              <div 
+                className="absolute top-0 bottom-0 bg-sky-200/50 border-x border-sky-300 flex items-center justify-center pointer-events-none"
+                style={{ left: '25%', width: '16.7%' }}
+              >
+                <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Morning Routine</span>
+              </div>
 
-            {/* Evening Calm: 19:30 - 22:00 */}
-            <div 
-              className="absolute top-0 bottom-0 bg-sky-200/50 border-x border-sky-300 flex items-center justify-center"
-              style={{ left: '81.2%', width: '10.5%' }}
-            >
-              <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Evening Calm</span>
-            </div>
+              {/* Evening Calm: 19:30 - 22:00 */}
+              <div 
+                className="absolute top-0 bottom-0 bg-sky-200/50 border-x border-sky-300 flex items-center justify-center pointer-events-none"
+                style={{ left: '81.2%', width: '10.5%' }}
+              >
+                <span className="text-[14px] font-bold text-sky-800 hidden sm:inline">Evening Calm</span>
+              </div>
 
-            {/* Curfew block: 22:30 - 24:00 */}
-            <div 
-              className="absolute right-0 top-0 bottom-0 bg-indigo-100/60 border-l border-indigo-200 flex items-center justify-center"
-              style={{ left: '93.7%', width: '6.3%' }}
-            >
-              <span className="text-[14px] font-semibold text-indigo-700 hidden sm:inline">Night Sleep</span>
-            </div>
-
-            {/* Pinned Sensor Event Glyphs along the timeline */}
-            {/* 07:18 Morning Foyer Motion */}
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 group cursor-pointer"
-              style={{ left: '30.4%' }}
-              title="07:18 AM — Morning Foyer Motion"
-            >
-              <div className="w-8 h-8 rounded-full bg-amber-400 text-slate-900 border-2 border-white flex items-center justify-center shadow-md">
-                <Sun className="w-4 h-4" />
+              {/* Curfew block: 22:30 - 24:00 */}
+              <div 
+                className="absolute right-0 top-0 bottom-0 bg-indigo-100/60 border-l border-indigo-200 flex items-center justify-center pointer-events-none"
+                style={{ left: '93.7%', width: '6.3%' }}
+              >
+                <span className="text-[14px] font-semibold text-indigo-700 hidden sm:inline">Night Sleep</span>
               </div>
             </div>
 
-            {/* 09:15 Front Door (Mail Collection) */}
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 group cursor-pointer"
-              style={{ left: '38.5%' }}
-              title="09:15 AM — Front Door (Mail collection)"
-            >
-              <div className="w-8 h-8 rounded-full bg-sky-500 text-white border-2 border-white flex items-center justify-center shadow-md">
-                <DoorClosed className="w-4 h-4" />
-              </div>
-            </div>
-
-            {/* 10:45 Porch Courier Delivery */}
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 group cursor-pointer"
-              style={{ left: '44.8%' }}
-              title="10:45 AM — Porch Courier Delivery (Video Doorbell)"
-            >
-              <div className="w-8 h-8 rounded-full bg-blue-500 text-white border-2 border-white flex items-center justify-center shadow-md">
-                <Bell className="w-4 h-4" />
-              </div>
-            </div>
-
-            {/* 11:45 In-Home Chime Check-in */}
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 group cursor-pointer"
-              style={{ left: '48.9%' }}
-              title="11:45 AM — In-Home Ambient Chime Played"
-            >
-              <div className="w-8 h-8 rounded-full bg-indigo-500 text-white border-2 border-white flex items-center justify-center shadow-md">
-                <Volume2 className="w-4 h-4" />
-              </div>
-            </div>
+            {/* Live Sensor Event Glyphs outside the overflow clip */}
+            {events.map((evt) => {
+              const percent = parseTimestampToPercent(evt.timestamp);
+              const glyph = getEventGlyph(evt);
+              return (
+                <div 
+                  key={evt.id}
+                  className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 group cursor-pointer transition-transform hover:scale-110"
+                  style={{ left: `${percent}%` }}
+                >
+                  <div className={`w-8 h-8 rounded-full ${glyph.bg} border-2 border-white flex items-center justify-center shadow-md`}>
+                    {glyph.icon}
+                  </div>
+                  {/* Tooltip on hover (visible and not cut off) */}
+                  <div className="hidden group-hover:block absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[14px] font-medium py-1.5 px-3 rounded-xl whitespace-nowrap shadow-2xl z-50 pointer-events-none">
+                    {glyph.label}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Time axis marks (min 14px) */}
