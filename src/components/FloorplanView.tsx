@@ -1,20 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RingEntrywayDevice } from '@/lib/types/devices';
 import { ResidentProfile } from '@/lib/types/profile';
 import { ResidentInfoBar } from './ResidentInfoBar';
+import { House3DView } from './House3DView';
 import {
   Box,
 } from 'lucide-react';
 
 interface FloorplanViewProps {
   sensors: RingEntrywayDevice[];
+  onToggleSensor: (sensorId: string) => void;
   profile: ResidentProfile;
 }
 
 export const FloorplanView: React.FC<FloorplanViewProps> = ({
   sensors,
+  onToggleSensor,
   profile,
 }) => {
+  const [selectedSensorId, setSelectedSensorId] = useState<string | null>('darly-contact-sensor');
+
   return (
     <div className="space-y-6">
       {/* Info Bar */}
@@ -39,6 +44,16 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
                 Rotate model with mouse. Click the doorbell, door, or motion sensor to interact.
               </p>
             </div>
+          </div>
+
+          {/* 3D Viewport */}
+          <div className="space-y-4">
+            <House3DView
+              sensors={sensors}
+              onToggleSensor={onToggleSensor}
+              selectedSensorId={selectedSensorId}
+              onSelectSensor={(id) => setSelectedSensorId(id)}
+            />
           </div>
         </div>
       </div>
