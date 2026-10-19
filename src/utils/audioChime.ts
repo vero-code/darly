@@ -181,6 +181,55 @@ class AmbientAudioEngine {
       }
     });
   }
+
+  // Play telephone ring tone
+  playPhoneRingTone(): Promise<void> {
+    return new Promise((resolve) => {
+      try {
+        this.init();
+        if (!this.audioCtx) {
+          resolve();
+          return;
+        }
+
+        const now = this.audioCtx.currentTime;
+        const cycles = [0, 0.85];
+
+        cycles.forEach((cycleOffset) => {
+          if (!this.audioCtx) return;
+          const notes = [
+            { freq: 440.00, start: 0.00, dur: 0.16, gain: 0.14 }, // A4
+            { freq: 554.37, start: 0.14, dur: 0.18, gain: 0.15 }, // C#5
+            { freq: 659.25, start: 0.30, dur: 0.38, gain: 0.17 }, // E5
+          ];
+
+          notes.forEach((note) => {
+            if (!this.audioCtx) return;
+            const osc = this.audioCtx.createOscillator();
+            const gain = this.audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(note.freq, now + cycleOffset + note.start);
+
+            gain.gain.setValueAtTime(0.0001, now + cycleOffset + note.start);
+            gain.gain.exponentialRampToValueAtTime(note.gain, now + cycleOffset + note.start + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + cycleOffset + note.start + note.dur);
+
+            osc.connect(gain);
+            gain.connect(this.audioCtx.destination);
+
+            osc.start(now + cycleOffset + note.start);
+            osc.stop(now + cycleOffset + note.start + note.dur);
+          });
+        });
+
+        setTimeout(resolve, 2000);
+      } catch (err) {
+        console.warn('Phone audio error:', err);
+        resolve();
+      }
+    });
+  }
 }
 
 export const ambientAudio = new AmbientAudioEngine();

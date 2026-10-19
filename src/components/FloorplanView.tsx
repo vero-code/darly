@@ -93,10 +93,14 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
         {/* Telemetry Panel */}
         <div className="lg:col-span-4 bg-white/95 border border-sky-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-6">
           {/* Ambient In-Home Chime Action Box */}
-          <div className="p-4 bg-gradient-to-br from-sky-50 to-blue-50/70 border border-sky-200 rounded-2xl space-y-3">
+          <div className={`p-4 rounded-2xl space-y-3 transition-all duration-300 ${
+            activeScenarioId === 'missed_routine'
+              ? 'bg-gradient-to-br from-amber-50/90 to-sky-50/80 border-2 border-amber-300 ring-2 ring-amber-100 shadow-sm'
+              : 'bg-gradient-to-br from-sky-50 to-blue-50/70 border border-sky-200'
+          }`}>
             <div className="flex items-center justify-between">
               <span className="text-[16px] font-bold text-slate-800 flex items-center gap-2">
-                <Volume2 className="w-5 h-5 text-sky-600" />
+                <Volume2 className={`w-5 h-5 ${activeScenarioId === 'missed_routine' ? 'text-amber-600' : 'text-sky-600'}`} />
                 <span>In-Home Chime</span>
               </span>
             </div>
@@ -105,7 +109,11 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
             </p>
             <button
               onClick={onSendChime}
-              className="w-full py-2.5 px-3 bg-white hover:bg-sky-50 text-sky-700 border border-sky-300 rounded-xl text-[14px] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+              className={`w-full py-2.5 px-3 rounded-xl text-[14px] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
+                activeScenarioId === 'missed_routine'
+                  ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-200'
+                  : 'bg-white hover:bg-sky-50 text-sky-700 border border-sky-300'
+              }`}
             >
               <Volume2 className="w-4 h-4" />
               <span>Play Chime</span>
@@ -120,6 +128,8 @@ export const FloorplanView: React.FC<FloorplanViewProps> = ({
           <CareScenariosPanel
             activeScenarioId={activeScenarioId}
             onSelectScenario={handleSelectScenario}
+            profile={profile}
+            isDoorOpen={sensors.find((s) => s.id === 'darly-contact-sensor')?.state === 'open'}
           />
         </div>
       </div>

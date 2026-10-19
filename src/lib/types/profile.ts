@@ -1,6 +1,7 @@
 export interface ResidentProfile {
   name: string;
   age: number;
+  phone?: string;
   address: string;
   notes: string;
   timezone: string;
@@ -12,7 +13,6 @@ export interface ResidentProfile {
   };
   neighborHelper: {
     name: string;
-    address: string;
     phone: string;
   };
   emergencyService: {

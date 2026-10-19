@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import type { ResidentProfile } from '@/lib/types/profile';
 import type { RoutineBaselineConfig } from '@/lib/engine/routine-baseline';
-import { 
-  X, 
-  Save, 
+import {
+  X,
+  Save,
   Check,
   Cloud
 } from 'lucide-react';
@@ -309,31 +309,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </span>
                 </div>
                 <p className="text-[14px] text-slate-600 leading-relaxed">
-                  Automated audio chime prompt played on the indoor Ring Chime speaker. Gently reminds the resident to verify and close the door before notifying any caregivers.
+                  Automated audio chime prompt played on the indoor Ring Chime speaker.
                 </p>
               </div>
 
-              {/* Tier 2: Primary Caregiver */}
+              {/* Tier 2: Resident Direct Call */}
               <div className="p-4 bg-sky-50/70 border border-sky-200 rounded-2xl space-y-3">
-                <div className="font-bold text-sky-800 text-[16px]">Primary Caregiver (Tier 2 Escalation)</div>
+                <div className="font-bold text-sky-800 text-[16px]">Direct Call (Tier 2 Escalation)</div>
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
-                    placeholder="Caregiver Name"
-                    value={formProfile.primaryCaregiver.name}
-                    onChange={(e) => setFormProfile({
-                      ...formProfile,
-                      primaryCaregiver: { ...formProfile.primaryCaregiver, name: e.target.value }
-                    })}
-                    className="px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 text-[16px]"
+                    value={formProfile.name}
+                    disabled
+                    className="px-4 py-2.5 bg-slate-100/80 border border-slate-200 rounded-xl text-slate-700 font-medium text-[16px]"
                   />
                   <input
                     type="text"
-                    placeholder="Phone"
-                    value={formProfile.primaryCaregiver.phone}
+                    placeholder="Direct Phone Number"
+                    value={formProfile.phone || ''}
                     onChange={(e) => setFormProfile({
                       ...formProfile,
-                      primaryCaregiver: { ...formProfile.primaryCaregiver, phone: e.target.value }
+                      phone: e.target.value
                     })}
                     className="px-4 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-900 font-mono text-[16px]"
                   />

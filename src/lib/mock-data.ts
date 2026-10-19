@@ -41,9 +41,10 @@ export const SIMULATED_DEVICES: RingEntrywayDevice[] = [
 export const DEFAULT_RESIDENT_PROFILE: ResidentProfile = {
   name: 'Margaret Holloway',
   age: 78,
+  phone: '+1 (555) 012-4491',
   timezone: 'America/Los_Angeles (PST)',
   address: '382 Orchard Crest Lane, Bellevue, WA 98004',
-  notes: 'Enjoys morning tea on porch. Takes morning blood pressure medication at 8:30 AM.',
+  notes: 'Enjoys morning tea on the front porch.',
   primaryCaregiver: {
     name: 'Sarah Holloway',
     relationship: 'Daughter',
@@ -53,7 +54,6 @@ export const DEFAULT_RESIDENT_PROFILE: ResidentProfile = {
   neighborHelper: {
     name: 'Thomas Campbell',
     phone: '+1 (555) 019-3310',
-    address: 'Apt 4B (Next door)',
   },
   emergencyService: {
     provider: 'Bellevue Emergency Medical Services (EMS)',
