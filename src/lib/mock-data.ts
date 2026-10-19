@@ -56,7 +56,7 @@ export const DEFAULT_RESIDENT_PROFILE: ResidentProfile = {
     phone: '+1 (555) 019-3310',
   },
   emergencyService: {
-    provider: 'Bellevue Emergency Medical Services (EMS)',
+    provider: 'Emergency Services (911)',
     phone: '911',
   },
 };

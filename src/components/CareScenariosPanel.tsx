@@ -298,21 +298,6 @@ export const CareScenariosPanel: React.FC<CareScenariosPanelProps> = ({
                 <ShieldAlert className="w-4 h-4" />
                 <span>Launch Emergency Protocol</span>
               </button>
-
-              {/* Quick Neighbor Porch Check Shortcut */}
-              <div className="flex items-center justify-between gap-2 pt-1">
-                <span className="text-[13px] text-rose-800 font-medium truncate">
-                  Neighbor Thomas (30s away):
-                </span>
-                <button
-                  type="button"
-                  onClick={handleQuickNeighborAlert}
-                  className="text-[13px] font-bold text-amber-900 hover:text-amber-950 underline underline-offset-2 cursor-pointer flex items-center gap-1 shrink-0"
-                >
-                  <UserCheck className="w-3.5 h-3.5" />
-                  <span>{quickNeighborNotified ? 'Alerted ✓' : 'Alert Porch Check'}</span>
-                </button>
-              </div>
             </div>
           )}
         </div>
