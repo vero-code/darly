@@ -61,55 +61,55 @@ darly/
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── ring/
-│   │   │   │   ├── analytics/      # GET: Aggregated routine metrics and anomaly analysis
-│   │   │   │   ├── config/         # GET/POST: Routine baseline thresholds (curfew, door-ajar limit)
-│   │   │   │   ├── devices/        # GET: Connected Ring entryway devices and telemetry
-│   │   │   │   ├── events/         # GET: Sensor activity event stream
-│   │   │   │   └── token/          # GET/POST: Ring API authentication token handler
+│   │   │   │   ├── analytics/      # Routine metrics and anomalies
+│   │   │   │   ├── config/         # Baseline safety thresholds
+│   │   │   │   ├── devices/        # Connected Ring devices
+│   │   │   │   ├── events/         # Sensor event stream
+│   │   │   │   └── token/          # Ring token management
 │   │   │   └── webhook/
-│   │   │       ├── route.ts        # POST: Ingests & validates Ring JSON:API webhook payloads
-│   │   │       └── test/route.ts   # GET: Test harness for injecting test sensor events
-│   │   ├── layout.tsx              # Root HTML wrapper and metadata
-│   │   └── page.tsx                # Main caregiver dashboard container
+│   │   │       ├── route.ts        # Ingests Ring webhooks
+│   │   │       └── test/route.ts   # Test webhook injector
+│   │   ├── layout.tsx              # Root layout and metadata
+│   │   └── page.tsx                # Main caregiver dashboard
 │   ├── components/
-│   │   ├── CameraFocusDock.tsx     # 3D viewport angle shortcuts (front door, porch, foyer)
-│   │   ├── CareScenariosPanel.tsx  # Scenario selector and caregiver diagnostic insights
-│   │   ├── ChimeModal.tsx          # Resident check-in chime modal with Web Audio feedback
-│   │   ├── CloudElements.tsx       # Real-time Ring cloud connection & API health pills
-│   │   ├── DeviceSpecCards.tsx     # Ring hardware cards with specs & official doc links
-│   │   ├── EmergencyModal.tsx      # Two-tier emergency escalation modal (neighbor / 911 dispatch)
-│   │   ├── EntrywayBadge.tsx       # Live status badge for the entryway perimeter
-│   │   ├── FloorplanView.tsx       # Interactive 3D and 2D floorplan canvas manager
-│   │   ├── Footer.tsx              # Application footer with version and safety disclaimer
-│   │   ├── Header.tsx              # Application header with live clock and scenario switch
-│   │   ├── House3DView.tsx         # Three.js interactive 3D entryway model with door/bell/motion meshes
-│   │   ├── PrivacyInspector.tsx    # "What The System Sees" dual-payload inspection view
-│   │   ├── QuickControlsOverlay.tsx# Floating physical device controls for rapid scenario testing
-│   │   ├── ResidentInfoBar.tsx     # Care recipient overview banner (name, age, address, contact)
-│   │   ├── RoutineTimeline.tsx     # Chronological daily sensor activity stream
-│   │   ├── SensorGrid.tsx          # Ring devices telemetry grid with filters and reset trigger
-│   │   └── SettingsModal.tsx       # Baseline routine schedules and emergency contact editor
+│   │   ├── CameraFocusDock.tsx     # 3D camera controls
+│   │   ├── CareScenariosPanel.tsx  # Scenario selector panel
+│   │   ├── ChimeModal.tsx          # Resident check-in modal
+│   │   ├── CloudElements.tsx       # Cloud status pills
+│   │   ├── DeviceSpecCards.tsx     # Hardware spec cards
+│   │   ├── EmergencyModal.tsx      # Emergency escalation modal
+│   │   ├── EntrywayBadge.tsx       # Entryway status badge
+│   │   ├── FloorplanView.tsx       # 3D entryway view
+│   │   ├── Footer.tsx              # Application footer
+│   │   ├── Header.tsx              # Header with controls
+│   │   ├── House3DView.tsx         # Three.js 3D model
+│   │   ├── PrivacyInspector.tsx    # Privacy telemetry inspector
+│   │   ├── QuickControlsOverlay.tsx# Device quick controls
+│   │   ├── ResidentInfoBar.tsx     # Resident info banner
+│   │   ├── RoutineTimeline.tsx     # Daily activity timeline
+│   │   ├── SensorGrid.tsx          # Device telemetry grid
+│   │   └── SettingsModal.tsx       # Routine settings modal
 │   ├── lib/
 │   │   ├── constants/
-│   │   │   └── ringDocs.ts         # Official Ring product & support documentation links
+│   │   │   └── ringDocs.ts         # Ring documentation links
 │   │   ├── engine/
-│   │   │   ├── anomaly-detector.ts # Sensor event sequence analysis & anomaly aggregation
-│   │   │   ├── routine-baseline.ts # Schedule windows, curfew times, and safety thresholds
-│   │   │   ├── rules.ts            # Deterministic classification rules (night wandering, courier)
-│   │   │   └── types.ts            # Alert levels (Safe, Info, Warning, Emergency) & evaluation types
+│   │   │   ├── anomaly-detector.ts # Routine anomaly detector
+│   │   │   ├── routine-baseline.ts # Baseline schedule config
+│   │   │   ├── rules.ts            # Safety classification rules
+│   │   │   └── types.ts            # Safety engine types
 │   │   ├── schemas/
-│   │   │   └── webhook.ts          # Zod validation schemas for incoming Ring webhook events
+│   │   │   └── webhook.ts          # Zod webhook schemas
 │   │   ├── types/
-│   │   │   ├── devices.ts          # RingEntrywayDevice and SensorEventLog interfaces
-│   │   │   ├── profile.ts          # ResidentProfile and emergency contact interfaces
-│   │   │   └── webhook.ts          # Amazon Ring JSON:API webhook data structures
-│   │   ├── auth.ts                 # Ring OAuth and access token authentication handler
-│   │   ├── mock-data.ts            # Default devices, resident profile, and seed events
-│   │   ├── scenarios.ts            # 4 pre-configured test scenarios (Safe, Emergency, Warning, Info)
-│   │   └── sse-broadcast.ts        # Server-Sent Events hub for live real-time updates
+│   │   │   ├── devices.ts          # Device data types
+│   │   │   ├── profile.ts          # Resident profile types
+│   │   │   └── webhook.ts          # Ring webhook types
+│   │   ├── auth.ts                 # Ring token auth
+│   │   ├── mock-data.ts            # Default seed data
+│   │   ├── scenarios.ts            # 4 care scenarios
+│   │   └── sse-broadcast.ts        # Real-time SSE hub
 │   └── utils/
-│       ├── audioChime.ts           # Web Audio API synthesizer for ambient doorbell & phone chimes
-│       └── timelineUtils.tsx       # Timeline formatting, badge colors, and Lucide icon mappers
+│       ├── audioChime.ts           # Web Audio synthesizer
+│       └── timelineUtils.tsx       # Timeline display helpers
 ├── public/                         # Static assets and icons
 ├── LICENSE                         # Apache License 2.0
 ├── package.json
