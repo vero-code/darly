@@ -9,7 +9,7 @@ Ambient, privacy-first caretaking system for elderly relatives using Ring entryw
 
 Darly monitors daily activity patterns exclusively through exterior and entryway telemetry (door contact sensors, foyer motion detectors, video doorbell) to detect safety anomalies without placing cameras inside private living spaces.
 
-Developed for the [Amazon Developer Hackathon](https://amazonappdev2026.devpost.com/) (Ring Track). View the official project submission on [Devpost](https://devpost.com/software/darly).
+Developed for the Amazon Developer Hackathon (Ring Track). View the official project submission on [Devpost](https://devpost.com/software/darly).
 
 ---
 
@@ -49,7 +49,7 @@ Darly is designed around official consumer Ring devices with documented specific
 | **Ring Alarm Contact Sensor** | Front Door | Door open/closed state, night wandering watchdog, door-ajar timer | [Ring Alarm Contact Sensor Guide](https://ring.com/support/articles/ju1zx/Setting-Up-and-Using-Your-Ring-Alarm-Contact-Sensor) |
 | **Ring Alarm Motion Detector** | Indoor Foyer | Entryway transit, morning wake-up routine detection | [Ring Alarm Motion Detector Guide](https://ring.com/support/articles/3osk6/Setting-up-and-Using-Your-Ring-Alarm-Motion-Detector) |
 
-All device models, event types (`door_opened`, `door_closed`, `motion_detected`, `ding`), and telemetry properties (battery level, online state) strictly adhere to official Ring device terminology.
+Device classifications, event types (`door_opened`, `door_closed`, `motion_detected`, `ding`), and connectivity status (`online: boolean`) strictly follow Amazon Ring API specifications, alongside standard Ring Device Health battery monitoring.
 
 ---
 
@@ -116,7 +116,6 @@ To connect to live Ring accounts via Ring Developer tools, configure `.env.local
 ```bash
 cp .env.example .env.local
 ```
-*(If no environment variables are provided, Darly runs in standalone mode with pre-configured baseline care scenarios).*
 
 ### Running Locally
 ```bash
@@ -135,6 +134,3 @@ npm run start
 ## License
 
 Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
-
-### Acknowledgments
-Core Ring API connection patterns and endpoint scaffolding are adapted from [AmazonAppDev/ring-api-helloworld](https://github.com/AmazonAppDev/ring-api-helloworld) (licensed under the MIT License).
