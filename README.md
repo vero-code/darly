@@ -9,6 +9,10 @@ Ambient, privacy-first caretaking system for elderly relatives using Ring entryw
 
 Darly monitors daily activity patterns exclusively through exterior and entryway telemetry (door contact sensors, foyer motion detectors, video doorbell) to detect safety anomalies without placing cameras inside private living spaces.
 
+> 📺 **Demo Video:**
+>
+> [![Darly Demo Video](https://img.youtube.com/vi/fRhMVxSJ2mA/hqdefault.jpg)](https://youtu.be/fRhMVxSJ2mA)
+
 Developed for the Amazon Developer Hackathon (Ring Track). View the official project submission on [Devpost](https://devpost.com/software/darly).
 
 ---
